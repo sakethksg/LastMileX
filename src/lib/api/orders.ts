@@ -22,10 +22,13 @@ export async function createOrder(input: CreateOrderInput) {
   });
 }
 
-export async function rescheduleCustomerOrder(id: string, scheduledDate?: string) {
+export async function rescheduleCustomerOrder(id: string, scheduledDate?: string, notes?: string) {
   return apiClient(`/api/orders/${id}/reschedule`, {
     method: "POST",
-    body: JSON.stringify({ scheduledDate }),
+    body: JSON.stringify({
+      scheduledDeliveryDate: scheduledDate || undefined,
+      notes: notes || undefined,
+    }),
   });
 }
 
@@ -58,9 +61,12 @@ export async function autoAssignOrder(orderId: string) {
   });
 }
 
-export async function rescheduleAdminOrder(orderId: string, scheduledDate?: string) {
+export async function rescheduleAdminOrder(orderId: string, scheduledDate?: string, notes?: string) {
   return apiClient(`/api/admin/orders/${orderId}/reschedule`, {
     method: "POST",
-    body: JSON.stringify({ scheduledDate }),
+    body: JSON.stringify({
+      scheduledDeliveryDate: scheduledDate || undefined,
+      notes: notes || undefined,
+    }),
   });
 }

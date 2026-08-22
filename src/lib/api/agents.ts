@@ -38,7 +38,7 @@ export async function completeDelivery(id: string) {
 export async function failDelivery(id: string, reason: DeliveryFailureReason, notes?: string) {
   return apiClient(`/api/agent/orders/${id}/fail-delivery`, {
     method: "POST",
-    body: JSON.stringify({ reason, notes }),
+    body: JSON.stringify({ failureReason: reason, notes: notes || undefined }),
   });
 }
 

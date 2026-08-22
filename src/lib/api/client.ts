@@ -37,13 +37,30 @@ export async function apiClient<T = any>(
     ...options.headers,
   };
 
-  const response = await fetch(endpoint, {
-    ...options,
-    headers,
-  });
+  let response: Response;
+  try {
+    response = await fetch(endpoint, {
+      ...options,
+      headers,
+    });
+  } catch (err: any) {
+    throw new ApiClientError(
+      err.message || "Network request failed. Please check your connection.",
+      0,
+      "NETWORK_ERROR"
+    );
+  }
 
   const isJson = response.headers.get("content-type")?.includes("application/json");
-  const payload: ApiResponse<T> = isJson ? await response.json() : null;
+  let payload: ApiResponse<T> | null = null;
+
+  if (isJson) {
+    try {
+      payload = await response.json();
+    } catch {
+      payload = null;
+    }
+  }
 
   if (!response.ok || (payload && payload.success === false)) {
     const message = payload?.error?.message || response.statusText || "Request failed";
