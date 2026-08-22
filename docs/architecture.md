@@ -219,17 +219,17 @@ sequenceDiagram
 ## Authentication & RBAC Strategy
 
 ### Authentication Flow
-1. **Registration**: User signs up via Supabase Auth → Supabase creates auth.users record → webhook/trigger creates application User record in public schema → CustomerProfile created
-2. **Login**: Supabase Auth handles credential verification → returns JWT → JWT contains user ID and custom claims
-3. **Session**: JWT stored in HTTP-only cookie → sent with every request → middleware validates
+1. **Registration**: User signs up via Supabase Auth client or admin route → Supabase creates `auth.users` record → application creates corresponding `User` record in `public` schema (`id = auth.users.id`, role, timestamps, metadata) → `CustomerProfile` created. Password credentials reside strictly in `auth.users`.
+2. **Login**: Client authenticates via Supabase Auth (`@supabase/ssr` browser client) → Supabase issues JWT session tokens stored in secure, HTTP-only cookies.
+3. **Session & Middleware**: Next.js App Router middleware (using `@supabase/ssr` `createServerClient`) refreshes sessions and extracts authenticated user context per request.
 
 ### RBAC Implementation
 ```
 Middleware Pipeline:
-  1. Extract JWT from Authorization header or cookie
-  2. Validate JWT with Supabase (supabase.auth.getUser())
-  3. Look up User record in application DB (includes role)
-  4. Attach user context to request
+  1. Extract session from cookies via @supabase/ssr
+  2. Validate session with Supabase (supabase.auth.getUser())
+  3. Look up User record in application DB via Prisma (includes application role)
+  4. Attach verified user context to request headers / server context
   5. Route-level role check:
      - /api/admin/* → requires role = ADMIN
      - /api/customer/* → requires role = CUSTOMER
@@ -241,22 +241,21 @@ Middleware Pipeline:
 
 ### Security Layers
 1. **Transport**: HTTPS (Vercel default)
-2. **Authentication**: Supabase JWT validation
-3. **Authorization**: Role-based middleware + ownership checks
+2. **Authentication**: Supabase Auth JWT with `@supabase/ssr` cookie-based verification
+3. **Authorization**: Server-side role-based middleware + resource ownership checks
 4. **Input Validation**: Zod schemas on every endpoint
 5. **Data Access**: Prisma parameterized queries (SQL injection prevention)
-6. **Secrets**: Environment variables only (.env.local), never in client code
-7. **CORS**: Configured for production domain only
-8. **Rate Limiting**: Per-endpoint limits
+6. **Secrets**: Strict environment variable separation (`.env.local`), `SUPABASE_SERVICE_ROLE_KEY` and `DATABASE_URL` never exposed to client
+7. **CORS & Headers**: Secure headers and strict origin limits
+8. **Rate Limiting**: Per-endpoint protection
 
 ### Supabase + Prisma Integration
-- **Supabase Auth**: Handles user authentication, JWT issuance, email verification
-- **Prisma**: All application data access goes through Prisma
-- **User sync**: On registration, Supabase Auth creates auth record, application creates User record with same ID
-- **No Supabase client for data queries in browser**: All data flows through Next.js API routes → Prisma
-- **Supabase client in browser**: ONLY for auth operations (login, logout, session refresh)
-- **Server-side Supabase admin client**: For user management operations (creating agents/admins)
-- **Database URL**: Supabase direct connection string used by Prisma
+- **Supabase Auth**: Dedicated exclusively to identity, credential storage, password hashing, and JWT issuance.
+- **@supabase/ssr**: Used for isomorphic cookie handling in Next.js Server Components, Server Actions, Route Handlers, and Middleware.
+- **Prisma**: Dedicated exclusively to application domain data access, relational integrity, migrations, and business entities.
+- **User Sync**: The application `User` entity uses the Supabase `auth.users.id` UUID as PK. No duplicate password storage exists in Prisma.
+- **Client Separation**: Browser code uses public anon key only for auth session operations; privileged database access occurs strictly server-side via Prisma.
+- **Database URL**: Supabase PostgreSQL connection string with transaction pooling for Prisma.
 
 ## Deployment Architecture
 
@@ -333,9 +332,9 @@ NODE_ENV=
 **Decision**: PIN code → ServiceArea → Zone mapping for MVP
 **Rationale**: Simple, reliable, no external API dependency. Suitable for Indian logistics where PIN codes are well-defined. Future: geocoding can supplement.
 
-### 6. Optimistic Locking + SELECT FOR UPDATE
-**Decision**: Combine optimistic locking (status checks in WHERE clause) with pessimistic locking (FOR UPDATE) for critical operations
-**Rationale**: Optimistic handles most cases cheaply. Pessimistic prevents assignment race conditions.
+### 6. Atomic Conditional Updates + Optimistic Concurrency
+**Decision**: Combine optimistic status checks for order lifecycle transitions with Prisma atomic conditional updates (`updateMany` checking `activeDeliveryCount < maxConcurrentOrders`) for agent assignment.
+**Rationale**: Eliminates race conditions in agent capacity allocation natively through Prisma without mandatory raw SQL locks, falling back to interactive transactions when multi-table coordination is required.
 
 ### 7. shadcn/ui + Tailwind CSS
 **Decision**: Component library for consistent UI

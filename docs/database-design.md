@@ -6,9 +6,9 @@ PostgreSQL via Supabase, accessed through Prisma ORM. The schema supports a last
 ## Entity Descriptions
 
 ### 1. User
-- **Purpose**: Primary identity table.
-- **Key Fields**: id (UUID, PK), email (unique), passwordHash, role (enum: CUSTOMER, DELIVERY_AGENT, ADMIN), name, phone, emailVerified, isActive, createdAt, updatedAt.
-- **Relationships**: Synced with Supabase Auth (id = Supabase auth.users.id). One-to-one with CustomerProfile, DeliveryAgentProfile. One-to-many with Orders, AgentAssignments, DeliveryAttempts, OrderTrackingEvents, and Notifications.
+- **Purpose**: Primary application user entity and identity reference. Supabase Auth is the sole authority for credentials, password hashing, and token issuance.
+- **Key Fields**: id (UUID, PK matching Supabase `auth.users.id`), email (unique), role (enum: CUSTOMER, DELIVERY_AGENT, ADMIN), name, phone, emailVerified, isActive, createdAt, updatedAt. (Note: No `passwordHash` is stored in the application database).
+- **Relationships**: Synced with Supabase Auth (`id` = Supabase `auth.users.id`). One-to-one with CustomerProfile, DeliveryAgentProfile. One-to-many with Orders, AgentAssignments, DeliveryAttempts, OrderTrackingEvents, and Notifications.
 - **Mutability**: Mutable (profile updates). Soft-delete via isActive flag.
 - **Important Indexes**: email (unique), role.
 - **Unique Constraints**: email.
@@ -62,10 +62,13 @@ PostgreSQL via Supabase, accessed through Prisma ORM. The schema supports a last
 ### 7. WeightSlab
 - **Purpose**: Weight-based pricing tiers within a rate card.
 - **Key Fields**: id (UUID, PK), rateCardId (FK → RateCard), minWeight (Decimal), maxWeight (Decimal), basePrice (Decimal), perKgRate (Decimal), createdAt.
+- **Semantics & Formula**: Slabs define $(minWeight, maxWeight]$ brackets. For a given chargeable weight $w$:
+  - If $w \le minWeight$, baseCharge = `basePrice`.
+  - If $w > minWeight$, baseCharge = `basePrice + (w - minWeight) * perKgRate`.
 - **Relationships**: Many-to-one with RateCard.
 - **Mutability**: Immutable (create new rate card version instead).
 - **Important Indexes**: rateCardId, (rateCardId + minWeight).
-- **Unique Constraints**: Slabs within a rate card must not overlap (app level).
+- **Unique Constraints**: Slabs within a rate card must not overlap (enforced at application layer).
 - **FK Behavior**: Cascades on RateCard delete.
 
 ### 8. CodSurcharge
@@ -178,8 +181,8 @@ erDiagram
 - **Zones/areas**: Soft-deleted, never hard-deleted.
 
 ## Concurrency Considerations
-- **Auto-assignment**: `SELECT ... FOR UPDATE` on agent profile to prevent double-assignment.
-- **Order status**: Optimistic locking via status check in `WHERE` clause.
+- **Auto-assignment**: Handled via Prisma atomic conditional updates (`updateMany` with `{ activeDeliveryCount: { lt: maxConcurrentOrders }, availability: 'AVAILABLE' }`). If `count === 0`, concurrency conflict is recognized and system retries with the next candidate. Raw SQL row locks (`SELECT FOR UPDATE`) within interactive transactions can be used where complex multi-row coordination is required.
+- **Order status**: Optimistic locking via status check in `WHERE` clause (`UPDATE orders SET status = :newStatus WHERE id = :orderId AND status = :expectedCurrentStatus`).
 - **Rate card lookups**: Read snapshot, no locking needed.
 
 ## Prisma Schema Notes
@@ -188,3 +191,4 @@ erDiagram
 - Use `@default(now())` for timestamps.
 - Enum types for all status/type fields.
 - Composite unique constraints documented above (use `@@unique([])`).
+

@@ -120,10 +120,56 @@ findApplicableRateCard(customerType, routeType, pickupZoneId, dropZoneId, date =
   3. If no rate card found → error: NO_RATE_CARD_FOUND
 ```
 
+### Weight Slab Definitions & Semantics
+
+Each `WeightSlab` defines a pricing bracket with four fields:
+- `minWeight` (kg): Lower weight threshold for this slab.
+- `maxWeight` (kg): Upper weight threshold for this slab (inclusive).
+- `basePrice` (INR): Base delivery fee for the slab.
+- `perKgRate` (INR/kg): Incremental rate per additional kilogram exceeding `minWeight`.
+
+#### Slab Formula
+For a package with chargeable weight $w$ falling into slab $(minWeight, maxWeight]$:
+$$\text{baseCharge} = \begin{cases} 
+\text{basePrice} & \text{if } w \le \text{minWeight} \\
+\text{basePrice} + (w - \text{minWeight}) \times \text{perKgRate} & \text{if } w > \text{minWeight}
+\end{cases}$$
+
+#### Boundary Examples
+
+**Example Configuration:**
+- Slab 1: `minWeight: 0.0`, `maxWeight: 1.0`, `basePrice: 50.00`, `perKgRate: 0.00` (Flat ₹50 up to 1kg)
+- Slab 2: `minWeight: 1.0`, `maxWeight: 5.0`, `basePrice: 50.00`, `perKgRate: 15.00` (₹50 base + ₹15/kg above 1kg)
+- Slab 3: `minWeight: 5.0`, `maxWeight: 20.0`, `basePrice: 110.00`, `perKgRate: 12.00` (₹110 base + ₹12/kg above 5kg)
+
+**Calculations at Boundaries:**
+1. **Weight = 0.5 kg**:
+   - Matches Slab 1 ($0.0 \le w \le 1.0$).
+   - $\text{baseCharge} = 50 + (0.5 - 0.0) \times 0 = \mathbf{50.00}$.
+2. **Weight = 1.0 kg (Exact boundary of Slab 1)**:
+   - Matches Slab 1 ($0.0 \le w \le 1.0$).
+   - $\text{baseCharge} = 50 + (1.0 - 0.0) \times 0 = \mathbf{50.00}$.
+3. **Weight = 1.5 kg (Enters Slab 2)**:
+   - Matches Slab 2 ($1.0 < w \le 5.0$).
+   - Excess weight $= 1.5 - 1.0 = 0.5\text{ kg}$.
+   - $\text{baseCharge} = 50 + (0.5 \times 15) = \mathbf{57.50}$.
+4. **Weight = 5.0 kg (Upper boundary of Slab 2)**:
+   - Matches Slab 2 ($1.0 < w \le 5.0$).
+   - Excess weight $= 5.0 - 1.0 = 4.0\text{ kg}$.
+   - $\text{baseCharge} = 50 + (4.0 \times 15) = \mathbf{110.00}$.
+5. **Weight = 5.5 kg (Enters Slab 3)**:
+   - Matches Slab 3 ($5.0 < w \le 20.0$).
+   - Excess weight $= 5.5 - 5.0 = 0.5\text{ kg}$.
+   - $\text{baseCharge} = 110 + (0.5 \times 12) = \mathbf{116.00}$.
+
 ### Weight Slab Selection
 ```pseudocode
 findWeightSlab(rateCardId, chargeableWeight):
-  Query weight slabs WHERE rateCardId = ? AND minWeight <= chargeableWeight AND maxWeight >= chargeableWeight
+  Query weight slabs WHERE rateCardId = ? 
+    AND (
+      (minWeight = 0 AND minWeight <= chargeableWeight AND maxWeight >= chargeableWeight)
+      OR (minWeight < chargeableWeight AND maxWeight >= chargeableWeight)
+    )
   ORDER BY minWeight ASC
   LIMIT 1
 

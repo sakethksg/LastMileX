@@ -115,12 +115,24 @@ autoAssign(orderId):
   
   7. ASSIGNMENT (with concurrency protection):
      - BEGIN TRANSACTION
-     - SELECT agent FOR UPDATE WHERE id = selectedAgent.id AND availability = 'AVAILABLE' AND activeDeliveryCount < maxConcurrentOrders
-     - If lock fails or conditions changed → retry with next candidate (up to 3 retries)
+     - Atomically update agent capacity using Prisma `updateMany`:
+       ```typescript
+       const updated = await prisma.deliveryAgentProfile.updateMany({
+         where: {
+           id: selectedAgent.id,
+           availability: 'AVAILABLE',
+           activeDeliveryCount: { lt: selectedAgent.maxConcurrentOrders }
+         },
+         data: {
+           activeDeliveryCount: { increment: 1 }
+         }
+       });
+       ```
+     - If `updated.count === 0` (capacity filled or agent unavailable concurrently):
+       Rollback/retry with next candidate in ranked list (up to 3 retries)
      - Create AgentAssignment (type: AUTO)
-     - Update agent.activeDeliveryCount += 1
-     - If activeDeliveryCount >= maxConcurrentOrders → agent.availability = 'BUSY'
-     - Update order.status = 'ASSIGNED'
+     - If new activeDeliveryCount >= maxConcurrentOrders: update availability = 'BUSY'
+     - Atomically update order status (`where: { id: orderId, status: { in: ['CONFIRMED', 'RESCHEDULED'] } }`)
      - Create DeliveryAttempt (or update existing for rescheduled)
      - Create TrackingEvent
      - COMMIT
@@ -145,33 +157,64 @@ Future: these could become database-configurable.
 
 ### Problem
 Multiple admin users or auto-assign requests could try to assign the same agent simultaneously, leading to:
-- Agent assigned more orders than maxConcurrentOrders
-- Multiple agents assigned to same order
+- Agent assigned more orders than `maxConcurrentOrders`
+- Multiple agents assigned to the same order
 
-### Solution: Pessimistic Locking
+### Primary Solution: Prisma Atomic Conditional Updates
+For high maintainability and clean Prisma ORM compatibility, we use atomic conditional updates:
+```typescript
+// 1. Atomically claim agent capacity slot
+const agentClaim = await prisma.deliveryAgentProfile.updateMany({
+  where: {
+    id: candidateAgentId,
+    availability: 'AVAILABLE',
+    activeDeliveryCount: { lt: maxConcurrentOrders }
+  },
+  data: {
+    activeDeliveryCount: { increment: 1 }
+  }
+});
+
+if (agentClaim.count === 0) {
+  // Concurrency conflict: agent was claimed concurrently or became unavailable
+  // Move to next candidate in ranked list
+  return retryWithNextCandidate();
+}
+
+// 2. Atomically assign order if still in assignable state
+const orderClaim = await prisma.order.updateMany({
+  where: {
+    id: orderId,
+    status: { in: ['CONFIRMED', 'RESCHEDULED'] }
+  },
+  data: {
+    status: 'ASSIGNED'
+  }
+});
+
+if (orderClaim.count === 0) {
+  // Order was modified or assigned concurrently: revert agent slot and fail
+  await prisma.deliveryAgentProfile.update({
+    where: { id: candidateAgentId },
+    data: { activeDeliveryCount: { decrement: 1 } }
+  });
+  throw new ConflictError('Order is no longer in assignable status');
+}
+```
+
+### Optional Fallback: Raw SQL SELECT FOR UPDATE
+For operations requiring multi-table locking in a single interactive transaction, raw SQL locking via `prisma.$queryRaw` within `prisma.$transaction` can be used:
 ```sql
--- Lock agent row during assignment
 SELECT * FROM delivery_agent_profiles
 WHERE id = $1
   AND availability = 'AVAILABLE'
   AND active_delivery_count < max_concurrent_orders
 FOR UPDATE;
-
--- If no row returned, agent state changed → retry or fail
-
--- Lock order row during assignment  
-SELECT * FROM orders
-WHERE id = $1
-  AND status IN ('CONFIRMED', 'RESCHEDULED')
-FOR UPDATE;
-
--- If no row returned, order state changed → fail
 ```
 
 ### Retry Strategy
-- If selected agent becomes unavailable during transaction: try next-best candidate
-- Maximum 3 retry attempts before returning NO_SUITABLE_AGENT
-- Each retry reloads agent state within the same transaction scope
+- If selected agent becomes unavailable during assignment: immediately attempt assignment on next candidate in scored list.
+- Maximum 3 candidate retry attempts before returning `NO_SUITABLE_AGENT`.
 
 ## Fallback Behaviour
 

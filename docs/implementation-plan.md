@@ -251,7 +251,7 @@
 - Manual assignment works with validation
 - Auto-assignment selects correct agent based on scoring
 - Zone match prioritized, then workload, proximity, recency
-- Concurrent assignment prevented (SELECT FOR UPDATE)
+- Concurrent assignment race conditions prevented via Prisma atomic conditional updates
 - Agent capacity limits enforced
 - No suitable agent returns clear error
 - Assignment records created with type (MANUAL/AUTO)

@@ -44,7 +44,7 @@ The assignment system matches delivery agents to orders using a deterministic, e
 
 **Tie-breaking**: Lowest workload → earliest registration date (deterministic).
 
-**Concurrency Protection**: SELECT FOR UPDATE locks both agent and order rows within a transaction. If the selected agent becomes unavailable mid-transaction, the system retries with the next-best candidate (up to 3 retries).
+**Concurrency Protection**: Prisma atomic conditional updates (`updateMany` checking available slots) prevent double-assignment race conditions. If capacity is taken concurrently, the system retries with the next-best candidate (up to 3 retries).
 
 **Availability Model**: Three states — AVAILABLE (ready), BUSY (at max capacity, system-managed), OFFLINE (not working). BUSY transitions are automatic when assignment count reaches the agent's configured maximum.
 

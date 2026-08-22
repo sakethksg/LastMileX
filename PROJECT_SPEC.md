@@ -74,7 +74,7 @@ Transitions are restricted by role. For example, agents can transition from `ASS
 - **Candidate Filtering**: Filters agents based on zone match, current availability, and active workload.
 - **Scoring System**: Ranks agents using a zone-match bonus, inverse workload score, and a proximity bonus (if location data is known).
 - **Tie-breaking**: Uses deterministic tie-breaking based on agent ID.
-- **Concurrency Control**: Implements optimistic locking or `SELECT FOR UPDATE` to prevent race conditions during assignment.
+- **Concurrency Control**: Implements Prisma atomic conditional updates (`updateMany` checking `activeDeliveryCount < maxConcurrentOrders` and `availability = 'AVAILABLE'`) with candidate retries on conflict.
 - **Fallback**: If no suitable agent is found, the order remains `CONFIRMED`, and the admin is notified for manual intervention.
 - **Reassignment**: Orders that are `FAILED` or `RESCHEDULED` re-enter the assignment pool for reassignment.
 
