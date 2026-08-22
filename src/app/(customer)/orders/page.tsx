@@ -1,10 +1,14 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { fetchCustomerOrders } from "@/lib/api/orders";
 import { OrderStatusBadge } from "@/components/ui/StatusBadge";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { ErrorState } from "@/components/ui/ErrorState";
 import Link from "next/link";
-import { Package, Search, Filter, Loader2, Calendar } from "lucide-react";
+import { PackagePlus } from "lucide-react";
 
 export default function CustomerOrdersPage() {
   const [orders, setOrders] = useState<any[]>([]);
@@ -12,84 +16,93 @@ export default function CustomerOrdersPage() {
   const [statusFilter, setStatusFilter] = useState("");
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function loadOrders() {
-      try {
-        setLoading(true);
-        const res = await fetchCustomerOrders({ status: statusFilter || undefined });
-        setOrders(res.items || res.orders || (Array.isArray(res) ? res : []));
-      } catch (err: any) {
-        setError(err.message || "Failed to load orders");
-      } finally {
-        setLoading(false);
-      }
+  const loadOrders = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const res = await fetchCustomerOrders({ status: statusFilter || undefined });
+      setOrders(res.items || res.orders || (Array.isArray(res) ? res : []));
+    } catch (err: any) {
+      setError(err.message || "Failed to load orders");
+    } finally {
+      setLoading(false);
     }
-    loadOrders();
   }, [statusFilter]);
+
+  useEffect(() => {
+    loadOrders();
+  }, [loadOrders]);
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">My Shipments</h1>
-          <p className="text-sm text-gray-500">View and track all your delivery orders</p>
-        </div>
+      <PageHeader
+        title="My Shipments"
+        subtitle="View, track, and manage all your delivery shipments"
+        actions={
+          <div className="flex flex-wrap items-center gap-3">
+            <div>
+              <label htmlFor="customer-status-filter" className="sr-only">Filter by Order Status</label>
+              <select
+                id="customer-status-filter"
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 shadow-xs outline-hidden focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              >
+                <option value="">All Statuses</option>
+                <option value="CONFIRMED">Confirmed</option>
+                <option value="ASSIGNED">Assigned</option>
+                <option value="PICKED_UP">Picked Up</option>
+                <option value="IN_TRANSIT">In Transit</option>
+                <option value="OUT_FOR_DELIVERY">Out for Delivery</option>
+                <option value="DELIVERED">Delivered</option>
+                <option value="FAILED">Failed</option>
+                <option value="RESCHEDULED">Rescheduled</option>
+                <option value="CANCELLED">Cancelled</option>
+              </select>
+            </div>
 
-        <div className="flex items-center gap-3">
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 shadow-xs outline-hidden"
-          >
-            <option value="">All Statuses</option>
-            <option value="CONFIRMED">Confirmed</option>
-            <option value="ASSIGNED">Assigned</option>
-            <option value="PICKED_UP">Picked Up</option>
-            <option value="IN_TRANSIT">In Transit</option>
-            <option value="OUT_FOR_DELIVERY">Out for Delivery</option>
-            <option value="DELIVERED">Delivered</option>
-            <option value="FAILED">Failed</option>
-            <option value="RESCHEDULED">Rescheduled</option>
-            <option value="CANCELLED">Cancelled</option>
-          </select>
-
-          <Link
-            href="/orders/new"
-            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-xs hover:bg-blue-700 transition"
-          >
-            + New Order
-          </Link>
-        </div>
-      </div>
+            <Link
+              href="/orders/new"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-xs hover:bg-blue-700 focus-visible:outline-2 focus-visible:outline-blue-600 transition"
+            >
+              <PackagePlus className="h-4 w-4" aria-hidden="true" />
+              New Order
+            </Link>
+          </div>
+        }
+      />
 
       {loading ? (
-        <div className="flex h-64 items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-        </div>
+        <LoadingSkeleton variant="table" message="Loading your orders..." />
       ) : error ? (
-        <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-red-700">
-          <p>{error}</p>
-        </div>
+        <ErrorState
+          title="Could Not Load Orders"
+          message={error}
+          onRetry={loadOrders}
+        />
       ) : orders.length === 0 ? (
-        <div className="rounded-2xl border border-gray-200 bg-white p-12 text-center shadow-xs">
-          <Package className="mx-auto h-12 w-12 text-gray-300" />
-          <h3 className="mt-4 text-base font-semibold text-gray-900">No shipments found</h3>
-          <p className="mt-1 text-sm text-gray-500">
-            {statusFilter ? "No orders match the selected filter." : "Create your first shipment to get started."}
-          </p>
-        </div>
+        <EmptyState
+          title={statusFilter ? "No matching shipments" : "No shipments found"}
+          description={
+            statusFilter
+              ? `No orders currently match the "${statusFilter}" status filter.`
+              : "You have not placed any shipment orders yet."
+          }
+          actionText={statusFilter ? undefined : "Create First Shipment"}
+          actionHref={statusFilter ? undefined : "/orders/new"}
+        />
       ) : (
         <div className="rounded-2xl border border-gray-200 bg-white overflow-hidden shadow-xs">
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
+            <table className="min-w-full text-left text-sm">
               <thead className="border-b border-gray-200 bg-gray-50 text-xs font-semibold uppercase tracking-wider text-gray-500">
                 <tr>
-                  <th className="py-3 px-4">Tracking Number</th>
-                  <th className="py-3 px-4">Status</th>
-                  <th className="py-3 px-4">Drop Destination</th>
-                  <th className="py-3 px-4">Payment</th>
-                  <th className="py-3 px-4">Date</th>
-                  <th className="py-3 px-4 text-right">Action</th>
+                  <th scope="col" className="py-3 px-4">Tracking Number</th>
+                  <th scope="col" className="py-3 px-4">Status</th>
+                  <th scope="col" className="py-3 px-4">Drop Destination</th>
+                  <th scope="col" className="py-3 px-4">Payment</th>
+                  <th scope="col" className="py-3 px-4">Date</th>
+                  <th scope="col" className="py-3 px-4 text-right">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -111,7 +124,7 @@ export default function CustomerOrdersPage() {
                     <td className="py-3.5 px-4 text-right">
                       <Link
                         href={`/orders/${order.id}`}
-                        className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 transition"
+                        className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 focus-visible:outline-2 focus-visible:outline-blue-600 transition"
                       >
                         View Details
                       </Link>

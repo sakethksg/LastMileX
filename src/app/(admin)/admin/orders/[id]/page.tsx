@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, use } from "react";
+import React, { useEffect, useState, useCallback, use } from "react";
 import {
   fetchAdminOrderById,
   assignOrderToAgent,
@@ -9,16 +9,15 @@ import {
 } from "@/lib/api/orders";
 import { fetchAdminAgents } from "@/lib/api/agents";
 import { OrderStatusBadge } from "@/components/ui/StatusBadge";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { Modal } from "@/components/ui/Modal";
+import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton";
+import { ErrorState } from "@/components/ui/ErrorState";
 import { OrderStatus } from "@/types/enums";
-import Link from "next/link";
 import {
-  ClipboardList,
   UserCheck,
   Zap,
   RotateCcw,
-  AlertTriangle,
-  CheckCircle2,
-  ArrowLeft,
   Loader2,
   MapPin,
   Package,
@@ -44,9 +43,10 @@ export default function AdminOrderInspectionPage({ params }: { params: Promise<{
   const [isRescheduling, setIsRescheduling] = useState(false);
   const [rescheduleDate, setRescheduleDate] = useState("");
 
-  const loadOrderAndAgents = React.useCallback(async () => {
+  const loadOrderAndAgents = useCallback(async () => {
     try {
       setLoading(true);
+      setError(null);
       const [orderData, agentsData] = await Promise.all([
         fetchAdminOrderById(orderId),
         fetchAdminAgents({ availability: "AVAILABLE" }).catch(() => ({ items: [] })),
@@ -66,7 +66,7 @@ export default function AdminOrderInspectionPage({ params }: { params: Promise<{
 
   const handleManualAssign = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedAgentId) return;
+    if (!selectedAgentId || actionLoading) return;
     setActionLoading(true);
     setError(null);
     try {
@@ -81,6 +81,7 @@ export default function AdminOrderInspectionPage({ params }: { params: Promise<{
   };
 
   const handleAutoAssign = async () => {
+    if (actionLoading) return;
     setActionLoading(true);
     setError(null);
     try {
@@ -95,6 +96,7 @@ export default function AdminOrderInspectionPage({ params }: { params: Promise<{
 
   const handleReschedule = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (actionLoading) return;
     setActionLoading(true);
     setError(null);
     try {
@@ -109,22 +111,22 @@ export default function AdminOrderInspectionPage({ params }: { params: Promise<{
   };
 
   if (loading) {
-    return (
-      <div className="flex h-96 items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
-      </div>
-    );
+    return <LoadingSkeleton message="Loading order inspection and driver availability..." />;
   }
 
   if (error && !order) {
     return (
       <div className="space-y-4">
-        <Link href="/admin/orders" className="inline-flex items-center gap-1.5 text-sm font-semibold text-purple-600">
-          <ArrowLeft className="h-4 w-4" /> Back to Orders
-        </Link>
-        <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-red-700">
-          <p>{error}</p>
-        </div>
+        <PageHeader
+          title="Order Inspection"
+          backHref="/admin/orders"
+          backLabel="Back to Orders"
+        />
+        <ErrorState
+          title="Could Not Load Order"
+          message={error}
+          onRetry={loadOrderAndAgents}
+        />
       </div>
     );
   }
@@ -142,177 +144,170 @@ export default function AdminOrderInspectionPage({ params }: { params: Promise<{
 
   return (
     <div className="space-y-8 max-w-5xl mx-auto">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-200 pb-4">
-        <div>
-          <Link href="/admin/orders" className="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-gray-900 mb-2">
-            <ArrowLeft className="h-3.5 w-3.5" /> Back to Orders
-          </Link>
-          <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold font-mono text-gray-900">{order.orderNumber}</h1>
-            <OrderStatusBadge status={order.status} />
-          </div>
-          <div className="text-xs text-gray-500 mt-1">
-            Customer: <span className="font-semibold text-gray-800">{order.customer?.name || order.customer?.email}</span> | Current Attempt: #{order.currentAttempt || 1}
-          </div>
-        </div>
+      <PageHeader
+        title={order.orderNumber}
+        subtitle={`Customer: ${order.customer?.name || order.customer?.email} | Attempt #${order.currentAttempt || 1}`}
+        backHref="/admin/orders"
+        backLabel="Back to Orders"
+        badge={<OrderStatusBadge status={order.status} />}
+        actions={
+          <div className="flex flex-wrap items-center gap-3">
+            {isAssignable && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => setIsAssigning(true)}
+                  disabled={actionLoading}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-purple-300 bg-white px-3.5 py-2 text-xs font-semibold text-purple-700 shadow-xs hover:bg-purple-50 disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-purple-600"
+                >
+                  <UserCheck className="h-4 w-4" aria-hidden="true" />
+                  Manual Assign
+                </button>
+                <button
+                  type="button"
+                  onClick={handleAutoAssign}
+                  disabled={actionLoading}
+                  aria-busy={actionLoading}
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-purple-600 px-3.5 py-2 text-xs font-semibold text-white shadow-xs hover:bg-purple-700 disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-purple-600"
+                >
+                  {actionLoading ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Zap className="h-4 w-4" aria-hidden="true" />}
+                  Auto-Assign Agent
+                </button>
+              </>
+            )}
 
-        {/* Action Controls */}
-        <div className="flex items-center gap-3">
-          {isAssignable && (
-            <>
+            {order.status === OrderStatus.FAILED && order.currentAttempt < (order.maxAttempts || 3) && (
               <button
-                onClick={() => setIsAssigning(true)}
-                disabled={actionLoading}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-purple-300 bg-white px-3.5 py-2 text-xs font-semibold text-purple-700 shadow-xs hover:bg-purple-50 disabled:opacity-50"
+                type="button"
+                onClick={() => setIsRescheduling(true)}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-orange-600 px-3.5 py-2 text-xs font-semibold text-white shadow-xs hover:bg-orange-700 focus-visible:outline-2 focus-visible:outline-orange-600"
               >
-                <UserCheck className="h-4 w-4" />
-                Manual Assign
+                <RotateCcw className="h-4 w-4" aria-hidden="true" />
+                Reschedule Order
               </button>
-              <button
-                onClick={handleAutoAssign}
-                disabled={actionLoading}
-                className="inline-flex items-center gap-1.5 rounded-lg bg-purple-600 px-3.5 py-2 text-xs font-semibold text-white shadow-xs hover:bg-purple-700 disabled:opacity-50"
-              >
-                {actionLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Zap className="h-4 w-4" />}
-                Auto-Assign Agent
-              </button>
-            </>
-          )}
-
-          {order.status === OrderStatus.FAILED && order.currentAttempt < (order.maxAttempts || 3) && (
-            <button
-              onClick={() => setIsRescheduling(true)}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-orange-600 px-3.5 py-2 text-xs font-semibold text-white shadow-xs hover:bg-orange-700"
-            >
-              <RotateCcw className="h-4 w-4" />
-              Reschedule Order
-            </button>
-          )}
-        </div>
-      </div>
+            )}
+          </div>
+        }
+      />
 
       {error && (
-        <div className="rounded-lg bg-red-50 p-4 text-xs font-semibold text-red-700 border border-red-200 flex items-center gap-2">
-          <AlertTriangle className="h-4 w-4 shrink-0" />
-          <span>{error}</span>
-        </div>
+        <ErrorState
+          title="Dispatch Action Failed"
+          message={error}
+          code="ORDER_STATE_CONFLICT"
+        />
       )}
 
-      {/* Manual Assignment Modal */}
-      {isAssigning && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl space-y-4">
-            <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-              <UserCheck className="h-5 w-5 text-purple-600" />
-              Manual Driver Assignment
-            </h3>
-            <p className="text-xs text-gray-600">Select an available delivery agent to assign this order to.</p>
-
-            <form onSubmit={handleManualAssign} className="space-y-4">
-              <div>
-                <label className="block text-xs font-semibold text-gray-700">Available Agent</label>
-                <select
-                  required
-                  value={selectedAgentId}
-                  onChange={(e) => setSelectedAgentId(e.target.value)}
-                  className="mt-1 w-full rounded-lg border border-gray-300 p-2.5 text-sm text-gray-900 outline-hidden"
-                >
-                  <option value="">-- Choose an Available Agent --</option>
-                  {agents.map((agent: any) => (
-                    <option key={agent.id} value={agent.userId || agent.user?.id}>
-                      {agent.user?.name || agent.user?.email} ({agent.vehicleType || "BIKE"} - {agent.activeDeliveryCount || 0}/{agent.maxConcurrentOrders} active)
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="flex justify-end gap-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setIsAssigning(false)}
-                  className="rounded-lg border border-gray-300 px-4 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={actionLoading || !selectedAgentId}
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-purple-600 px-4 py-2 text-xs font-semibold text-white hover:bg-purple-700 disabled:opacity-50"
-                >
-                  {actionLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
-                  Assign Order
-                </button>
-              </div>
-            </form>
+      {/* Accessible Manual Assignment Modal */}
+      <Modal
+        isOpen={isAssigning}
+        onClose={() => setIsAssigning(false)}
+        title="Manual Driver Assignment"
+        description="Select an available delivery agent to assign this shipment to."
+      >
+        <form onSubmit={handleManualAssign} className="space-y-4">
+          <div>
+            <label htmlFor="admin-select-agent" className="block text-xs font-semibold text-gray-700">
+              Available Agent
+            </label>
+            <select
+              id="admin-select-agent"
+              required
+              value={selectedAgentId}
+              onChange={(e) => setSelectedAgentId(e.target.value)}
+              className="mt-1 w-full rounded-lg border border-gray-300 p-2.5 text-sm text-gray-900 outline-hidden focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+            >
+              <option value="">-- Choose an Available Agent --</option>
+              {agents.map((agent: any) => (
+                <option key={agent.id} value={agent.userId || agent.user?.id}>
+                  {agent.user?.name || agent.user?.email} ({agent.vehicleType || "BIKE"} - {agent.activeDeliveryCount || 0}/{agent.maxConcurrentOrders} active)
+                </option>
+              ))}
+            </select>
           </div>
-        </div>
-      )}
 
-      {/* Reschedule Modal */}
-      {isRescheduling && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl space-y-4">
-            <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-              <RotateCcw className="h-5 w-5 text-orange-600" />
-              Admin Reschedule Order
-            </h3>
-            <p className="text-xs text-gray-600">
-              Reschedule this failed order for attempt #{order.currentAttempt + 1} of {order.maxAttempts || 3}.
-            </p>
-
-            <form onSubmit={handleReschedule} className="space-y-4">
-              <div>
-                <label className="block text-xs font-semibold text-gray-700">Scheduled Date (Optional)</label>
-                <input
-                  type="date"
-                  value={rescheduleDate}
-                  min={new Date().toISOString().split("T")[0]}
-                  onChange={(e) => setRescheduleDate(e.target.value)}
-                  className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm text-gray-900 outline-hidden"
-                />
-              </div>
-
-              <div className="flex justify-end gap-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setIsRescheduling(false)}
-                  className="rounded-lg border border-gray-300 px-4 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={actionLoading}
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-orange-600 px-4 py-2 text-xs font-semibold text-white hover:bg-orange-700 disabled:opacity-50"
-                >
-                  {actionLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
-                  Confirm Reschedule
-                </button>
-              </div>
-            </form>
+          <div className="flex justify-end gap-2 pt-2 border-t border-gray-100">
+            <button
+              type="button"
+              onClick={() => setIsAssigning(false)}
+              className="rounded-lg border border-gray-300 px-4 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50 focus-visible:outline-2 focus-visible:outline-purple-600"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={actionLoading || !selectedAgentId}
+              aria-busy={actionLoading}
+              className="inline-flex items-center gap-1.5 rounded-lg bg-purple-600 px-4 py-2 text-xs font-semibold text-white hover:bg-purple-700 disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-purple-600"
+            >
+              {actionLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" /> : null}
+              Assign Order
+            </button>
           </div>
-        </div>
-      )}
+        </form>
+      </Modal>
+
+      {/* Accessible Reschedule Modal */}
+      <Modal
+        isOpen={isRescheduling}
+        onClose={() => setIsRescheduling(false)}
+        title="Admin Reschedule Order"
+        description={`Reschedule this failed order for attempt #${order.currentAttempt + 1} of ${order.maxAttempts || 3}.`}
+      >
+        <form onSubmit={handleReschedule} className="space-y-4">
+          <div>
+            <label htmlFor="admin-reschedule-date" className="block text-xs font-semibold text-gray-700">
+              Scheduled Date (Optional)
+            </label>
+            <input
+              id="admin-reschedule-date"
+              type="date"
+              value={rescheduleDate}
+              min={new Date().toISOString().split("T")[0]}
+              onChange={(e) => setRescheduleDate(e.target.value)}
+              className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm text-gray-900 outline-hidden focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+            />
+          </div>
+
+          <div className="flex justify-end gap-2 pt-2 border-t border-gray-100">
+            <button
+              type="button"
+              onClick={() => setIsRescheduling(false)}
+              className="rounded-lg border border-gray-300 px-4 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50 focus-visible:outline-2 focus-visible:outline-purple-600"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={actionLoading}
+              aria-busy={actionLoading}
+              className="inline-flex items-center gap-1.5 rounded-lg bg-orange-600 px-4 py-2 text-xs font-semibold text-white hover:bg-orange-700 disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-orange-600"
+            >
+              {actionLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" /> : null}
+              Confirm Reschedule
+            </button>
+          </div>
+        </form>
+      </Modal>
 
       {/* Info Grids */}
       <div className="grid md:grid-cols-3 gap-6">
         <div className="md:col-span-2 space-y-6">
-          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-xs space-y-4">
+          <section aria-label="Routing and assignment" className="rounded-2xl border border-gray-200 bg-white p-6 shadow-xs space-y-4">
             <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
-              <MapPin className="h-5 w-5 text-purple-600" />
+              <MapPin className="h-5 w-5 text-purple-600" aria-hidden="true" />
               Addresses & Active Assignment
             </h2>
 
             <div className="grid sm:grid-cols-2 gap-4 text-sm">
               <div className="bg-gray-50 p-3.5 rounded-xl border border-gray-100">
-                <div className="text-xs font-semibold text-gray-500 uppercase">Pickup Location</div>
+                <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Pickup Location</div>
                 <div className="mt-1 text-gray-900 font-medium">{order.pickupAddress}</div>
                 <div className="text-xs text-gray-500 mt-1">PIN: {order.pickupPinCode}</div>
               </div>
 
               <div className="bg-gray-50 p-3.5 rounded-xl border border-gray-100">
-                <div className="text-xs font-semibold text-gray-500 uppercase">Drop Location</div>
+                <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Drop Location</div>
                 <div className="mt-1 text-gray-900 font-medium">{order.dropAddress}</div>
                 <div className="text-xs text-gray-500 mt-1">PIN: {order.dropPinCode}</div>
               </div>
@@ -321,10 +316,10 @@ export default function AdminOrderInspectionPage({ params }: { params: Promise<{
             {assignedAgent ? (
               <div className="mt-4 flex items-center gap-3 border-t border-gray-100 pt-4 bg-purple-50/50 p-3 rounded-xl border border-purple-100">
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-purple-100 text-purple-700 font-bold">
-                  <User className="h-5 w-5" />
+                  <User className="h-5 w-5" aria-hidden="true" />
                 </div>
                 <div>
-                  <div className="text-xs font-semibold uppercase text-purple-700">Currently Assigned Driver</div>
+                  <div className="text-xs font-semibold uppercase tracking-wider text-purple-700">Currently Assigned Driver</div>
                   <div className="font-bold text-gray-900 text-sm">{assignedAgent.name || assignedAgent.email}</div>
                   {assignedAgent.phone && <div className="text-xs text-gray-600">{assignedAgent.phone}</div>}
                 </div>
@@ -334,19 +329,19 @@ export default function AdminOrderInspectionPage({ params }: { params: Promise<{
                 No active driver assigned yet. Use Manual Assign or Auto-Assign above.
               </div>
             )}
-          </div>
+          </section>
 
           {/* Tracking Timeline */}
-          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-xs space-y-4">
+          <section aria-label="Tracking state audit" className="rounded-2xl border border-gray-200 bg-white p-6 shadow-xs space-y-4">
             <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
-              <Clock className="h-5 w-5 text-purple-600" />
+              <Clock className="h-5 w-5 text-purple-600" aria-hidden="true" />
               State Machine Audit Trail
             </h2>
 
             <div className="relative pl-6 space-y-5 before:absolute before:left-2.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-purple-200">
               {trackingEvents.map((event: any) => (
                 <div key={event.id} className="relative">
-                  <div className="absolute -left-6 top-1.5 h-3.5 w-3.5 rounded-full border-2 border-white bg-purple-600 shadow-xs" />
+                  <div className="absolute -left-6 top-1.5 h-3.5 w-3.5 rounded-full border-2 border-white bg-purple-600 shadow-xs" aria-hidden="true" />
                   <div className="text-xs font-bold text-gray-900">
                     {event.newStatus.replace(/_/g, " ")}
                   </div>
@@ -357,14 +352,14 @@ export default function AdminOrderInspectionPage({ params }: { params: Promise<{
                 </div>
               ))}
             </div>
-          </div>
+          </section>
         </div>
 
         {/* Pricing Snapshot */}
         <div className="space-y-6">
-          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-xs space-y-4">
+          <section aria-label="Pricing snapshot" className="rounded-2xl border border-gray-200 bg-white p-6 shadow-xs space-y-4">
             <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
-              <Package className="h-5 w-5 text-purple-600" />
+              <Package className="h-5 w-5 text-purple-600" aria-hidden="true" />
               Pricing Snapshot
             </h2>
 
@@ -400,11 +395,11 @@ export default function AdminOrderInspectionPage({ params }: { params: Promise<{
             ) : (
               <p className="text-xs text-gray-500">Pricing snapshot unavailable.</p>
             )}
-          </div>
+          </section>
 
           {/* Attempts */}
           {attempts.length > 0 && (
-            <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-xs space-y-3">
+            <section aria-label="Delivery attempt history" className="rounded-2xl border border-gray-200 bg-white p-6 shadow-xs space-y-3">
               <h2 className="text-sm font-bold text-gray-900">Attempt Records ({attempts.length}/{order.maxAttempts || 3})</h2>
               <div className="space-y-2">
                 {attempts.map((att: any) => (
@@ -423,7 +418,7 @@ export default function AdminOrderInspectionPage({ params }: { params: Promise<{
                   </div>
                 ))}
               </div>
-            </div>
+            </section>
           )}
         </div>
       </div>

@@ -1,52 +1,58 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { fetchAgentAssignedOrders } from "@/lib/api/agents";
 import { OrderStatusBadge } from "@/components/ui/StatusBadge";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { ErrorState } from "@/components/ui/ErrorState";
 import Link from "next/link";
-import { Truck, ArrowRight, Loader2, MapPin } from "lucide-react";
+import { Truck, ArrowRight, MapPin } from "lucide-react";
 
 export default function AgentOrdersPage() {
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function loadOrders() {
-      try {
-        setLoading(true);
-        const res = await fetchAgentAssignedOrders();
-        setOrders(Array.isArray(res) ? res : res.orders || res.items || []);
-      } catch (err: any) {
-        setError(err.message || "Failed to load assigned orders");
-      } finally {
-        setLoading(false);
-      }
+  const loadOrders = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const res = await fetchAgentAssignedOrders();
+      setOrders(Array.isArray(res) ? res : res.orders || res.items || []);
+    } catch (err: any) {
+      setError(err.message || "Failed to load assigned orders");
+    } finally {
+      setLoading(false);
     }
-    loadOrders();
   }, []);
+
+  useEffect(() => {
+    loadOrders();
+  }, [loadOrders]);
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Assigned Deliveries</h1>
-        <p className="text-sm text-gray-500">Pick up packages, navigate dispatches, and execute delivery handoffs</p>
-      </div>
+      <PageHeader
+        title="Assigned Deliveries"
+        subtitle="Pick up packages, navigate dispatches, and execute delivery handoffs"
+      />
 
       {loading ? (
-        <div className="flex h-64 items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-        </div>
+        <LoadingSkeleton variant="card" message="Loading assigned delivery dispatches..." />
       ) : error ? (
-        <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-red-700">
-          <p>{error}</p>
-        </div>
+        <ErrorState
+          title="Could Not Load Deliveries"
+          message={error}
+          onRetry={loadOrders}
+        />
       ) : orders.length === 0 ? (
-        <div className="rounded-2xl border border-gray-200 bg-white p-12 text-center shadow-xs">
-          <Truck className="mx-auto h-12 w-12 text-gray-300" />
-          <h3 className="mt-4 text-base font-semibold text-gray-900">No active delivery assignments</h3>
-          <p className="mt-1 text-sm text-gray-500">New dispatches assigned to your route will appear here.</p>
-        </div>
+        <EmptyState
+          icon={<Truck className="h-7 w-7 text-gray-400" aria-hidden="true" />}
+          title="No Active Assignments"
+          description="You currently have no active deliveries assigned. New route dispatches will appear here."
+        />
       ) : (
         <div className="grid sm:grid-cols-2 gap-4">
           {orders.map((order) => (
@@ -58,14 +64,14 @@ export default function AgentOrdersPage() {
 
               <div className="space-y-2 text-xs text-gray-600">
                 <div className="flex items-start gap-2">
-                  <MapPin className="h-4 w-4 text-blue-500 shrink-0 mt-0.5" />
+                  <MapPin className="h-4 w-4 text-blue-500 shrink-0 mt-0.5" aria-hidden="true" />
                   <div>
                     <span className="font-semibold text-gray-700">Pickup: </span>
                     {order.pickupAddress} (PIN: {order.pickupPinCode})
                   </div>
                 </div>
                 <div className="flex items-start gap-2">
-                  <MapPin className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
+                  <MapPin className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" aria-hidden="true" />
                   <div>
                     <span className="font-semibold text-gray-700">Drop: </span>
                     {order.dropAddress} (PIN: {order.dropPinCode})
@@ -79,9 +85,9 @@ export default function AgentOrdersPage() {
                 </span>
                 <Link
                   href={`/agent/orders/${order.id}`}
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-700 transition"
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-700 focus-visible:outline-2 focus-visible:outline-blue-600 transition"
                 >
-                  Execute Delivery <ArrowRight className="h-3.5 w-3.5" />
+                  Execute Delivery <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
                 </Link>
               </div>
             </div>

@@ -1,10 +1,14 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { fetchAdminOrders } from "@/lib/api/orders";
 import { OrderStatusBadge } from "@/components/ui/StatusBadge";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { ErrorState } from "@/components/ui/ErrorState";
 import Link from "next/link";
-import { ClipboardList, Search, Loader2 } from "lucide-react";
+import { ClipboardList } from "lucide-react";
 
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<any[]>([]);
@@ -13,88 +17,101 @@ export default function AdminOrdersPage() {
   const [search, setSearch] = useState("");
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function loadOrders() {
-      try {
-        setLoading(true);
-        const res = await fetchAdminOrders({
-          status: statusFilter || undefined,
-          search: search || undefined,
-        });
-        setOrders(res.items || res.orders || (Array.isArray(res) ? res : []));
-      } catch (err: any) {
-        setError(err.message || "Failed to load orders");
-      } finally {
-        setLoading(false);
-      }
+  const loadOrders = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const res = await fetchAdminOrders({
+        status: statusFilter || undefined,
+        search: search || undefined,
+      });
+      setOrders(res.items || res.orders || (Array.isArray(res) ? res : []));
+    } catch (err: any) {
+      setError(err.message || "Failed to load orders");
+    } finally {
+      setLoading(false);
     }
-    loadOrders();
   }, [statusFilter, search]);
+
+  useEffect(() => {
+    loadOrders();
+  }, [loadOrders]);
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Orders & Dispatch Management</h1>
-          <p className="text-sm text-gray-500">Monitor all dispatches, assign drivers, and handle retries</p>
-        </div>
+      <PageHeader
+        title="Orders & Dispatch Management"
+        subtitle="Monitor all dispatches, assign drivers, and handle retries"
+        actions={
+          <div className="flex flex-wrap items-center gap-3">
+            <div>
+              <label htmlFor="admin-order-search" className="sr-only">Search order number</label>
+              <input
+                id="admin-order-search"
+                type="text"
+                placeholder="Search order number..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-xs outline-hidden focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+              />
+            </div>
 
-        <div className="flex flex-wrap items-center gap-3">
-          <input
-            type="text"
-            placeholder="Search order number..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-xs outline-hidden"
-          />
-
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 shadow-xs outline-hidden"
-          >
-            <option value="">All Statuses</option>
-            <option value="CREATED">Created</option>
-            <option value="CONFIRMED">Confirmed</option>
-            <option value="ASSIGNED">Assigned</option>
-            <option value="PICKED_UP">Picked Up</option>
-            <option value="IN_TRANSIT">In Transit</option>
-            <option value="OUT_FOR_DELIVERY">Out for Delivery</option>
-            <option value="DELIVERED">Delivered</option>
-            <option value="FAILED">Failed</option>
-            <option value="RESCHEDULED">Rescheduled</option>
-            <option value="CANCELLED">Cancelled</option>
-          </select>
-        </div>
-      </div>
+            <div>
+              <label htmlFor="admin-status-filter" className="sr-only">Filter by Status</label>
+              <select
+                id="admin-status-filter"
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 shadow-xs outline-hidden focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+              >
+                <option value="">All Statuses</option>
+                <option value="CREATED">Created</option>
+                <option value="CONFIRMED">Confirmed</option>
+                <option value="ASSIGNED">Assigned</option>
+                <option value="PICKED_UP">Picked Up</option>
+                <option value="IN_TRANSIT">In Transit</option>
+                <option value="OUT_FOR_DELIVERY">Out for Delivery</option>
+                <option value="DELIVERED">Delivered</option>
+                <option value="FAILED">Failed</option>
+                <option value="RESCHEDULED">Rescheduled</option>
+                <option value="CANCELLED">Cancelled</option>
+              </select>
+            </div>
+          </div>
+        }
+      />
 
       {loading ? (
-        <div className="flex h-64 items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
-        </div>
+        <LoadingSkeleton variant="table" message="Loading dispatch orders..." />
       ) : error ? (
-        <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-red-700">
-          <p>{error}</p>
-        </div>
+        <ErrorState
+          title="Could Not Load Orders"
+          message={error}
+          onRetry={loadOrders}
+        />
       ) : orders.length === 0 ? (
-        <div className="rounded-2xl border border-gray-200 bg-white p-12 text-center shadow-xs">
-          <ClipboardList className="mx-auto h-12 w-12 text-gray-300" />
-          <h3 className="mt-4 text-base font-semibold text-gray-900">No orders found</h3>
-          <p className="mt-1 text-sm text-gray-500">No orders match the current search or status filter.</p>
-        </div>
+        <EmptyState
+          icon={<ClipboardList className="h-7 w-7 text-gray-400" aria-hidden="true" />}
+          title="No Orders Found"
+          description={
+            statusFilter || search
+              ? "No orders match the current search or status filter criteria."
+              : "No orders are currently present in the system."
+          }
+        />
       ) : (
         <div className="rounded-2xl border border-gray-200 bg-white overflow-hidden shadow-xs">
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
+            <table className="min-w-full text-left text-sm">
               <thead className="border-b border-gray-200 bg-gray-50 text-xs font-semibold uppercase tracking-wider text-gray-500">
                 <tr>
-                  <th className="py-3.5 px-4">Order Number</th>
-                  <th className="py-3.5 px-4">Status</th>
-                  <th className="py-3.5 px-4">Customer</th>
-                  <th className="py-3.5 px-4">Drop Address</th>
-                  <th className="py-3.5 px-4">Attempt</th>
-                  <th className="py-3.5 px-4">Date</th>
-                  <th className="py-3.5 px-4 text-right">Actions</th>
+                  <th scope="col" className="py-3.5 px-4">Order Number</th>
+                  <th scope="col" className="py-3.5 px-4">Status</th>
+                  <th scope="col" className="py-3.5 px-4">Customer</th>
+                  <th scope="col" className="py-3.5 px-4">Drop Address</th>
+                  <th scope="col" className="py-3.5 px-4">Attempt</th>
+                  <th scope="col" className="py-3.5 px-4">Date</th>
+                  <th scope="col" className="py-3.5 px-4 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -119,7 +136,7 @@ export default function AdminOrdersPage() {
                     <td className="py-3.5 px-4 text-right">
                       <Link
                         href={`/admin/orders/${order.id}`}
-                        className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 transition"
+                        className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 focus-visible:outline-2 focus-visible:outline-purple-600 transition"
                       >
                         Inspect & Assign
                       </Link>

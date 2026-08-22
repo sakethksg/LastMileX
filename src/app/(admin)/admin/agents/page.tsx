@@ -1,10 +1,14 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { fetchAdminAgents } from "@/lib/api/agents";
 import { AgentAvailabilityBadge } from "@/components/ui/StatusBadge";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { ErrorState } from "@/components/ui/ErrorState";
 import Link from "next/link";
-import { Users, Search, Loader2 } from "lucide-react";
+import { Users } from "lucide-react";
 
 export default function AdminAgentsPage() {
   const [agents, setAgents] = useState<any[]>([]);
@@ -13,81 +17,93 @@ export default function AdminAgentsPage() {
   const [search, setSearch] = useState("");
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function loadAgents() {
-      try {
-        setLoading(true);
-        const res = await fetchAdminAgents({
-          availability: availabilityFilter || undefined,
-          search: search || undefined,
-        });
-        setAgents(res.items || res.agents || (Array.isArray(res) ? res : []));
-      } catch (err: any) {
-        setError(err.message || "Failed to load agents");
-      } finally {
-        setLoading(false);
-      }
+  const loadAgents = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const res = await fetchAdminAgents({
+        availability: availabilityFilter || undefined,
+        search: search || undefined,
+      });
+      setAgents(res.items || res.agents || (Array.isArray(res) ? res : []));
+    } catch (err: any) {
+      setError(err.message || "Failed to load agents");
+    } finally {
+      setLoading(false);
     }
-    loadAgents();
   }, [availabilityFilter, search]);
+
+  useEffect(() => {
+    loadAgents();
+  }, [loadAgents]);
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Delivery Agent Fleet</h1>
-          <p className="text-sm text-gray-500">Monitor driver availability, active capacities, and shift assignments</p>
-        </div>
+      <PageHeader
+        title="Delivery Agent Fleet"
+        subtitle="Monitor driver availability, active capacities, and vehicle configurations"
+        actions={
+          <div className="flex flex-wrap items-center gap-3">
+            <div>
+              <label htmlFor="admin-agent-search" className="sr-only">Search driver</label>
+              <input
+                id="admin-agent-search"
+                type="text"
+                placeholder="Search agent name/phone..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-xs outline-hidden focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+              />
+            </div>
 
-        <div className="flex flex-wrap items-center gap-3">
-          <input
-            type="text"
-            placeholder="Search agent name/phone..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-xs outline-hidden"
-          />
-
-          <select
-            value={availabilityFilter}
-            onChange={(e) => setAvailabilityFilter(e.target.value)}
-            className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 shadow-xs outline-hidden"
-          >
-            <option value="">All Statuses</option>
-            <option value="AVAILABLE">Available</option>
-            <option value="BUSY">Busy</option>
-            <option value="OFFLINE">Offline</option>
-            <option value="ON_LEAVE">On Leave</option>
-          </select>
-        </div>
-      </div>
+            <div>
+              <label htmlFor="admin-agent-availability-filter" className="sr-only">Filter by Availability</label>
+              <select
+                id="admin-agent-availability-filter"
+                value={availabilityFilter}
+                onChange={(e) => setAvailabilityFilter(e.target.value)}
+                className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 shadow-xs outline-hidden focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+              >
+                <option value="">All Availability</option>
+                <option value="AVAILABLE">Available</option>
+                <option value="BUSY">Busy</option>
+                <option value="OFFLINE">Offline</option>
+              </select>
+            </div>
+          </div>
+        }
+      />
 
       {loading ? (
-        <div className="flex h-64 items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
-        </div>
+        <LoadingSkeleton variant="table" message="Loading driver fleet records..." />
       ) : error ? (
-        <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-red-700">
-          <p>{error}</p>
-        </div>
+        <ErrorState
+          title="Could Not Load Agent Fleet"
+          message={error}
+          onRetry={loadAgents}
+        />
       ) : agents.length === 0 ? (
-        <div className="rounded-2xl border border-gray-200 bg-white p-12 text-center shadow-xs">
-          <Users className="mx-auto h-12 w-12 text-gray-300" />
-          <h3 className="mt-4 text-base font-semibold text-gray-900">No agents found</h3>
-          <p className="mt-1 text-sm text-gray-500">No delivery agents match your filter criteria.</p>
-        </div>
+        <EmptyState
+          icon={<Users className="h-7 w-7 text-gray-400" aria-hidden="true" />}
+          title="No Delivery Agents Found"
+          description={
+            availabilityFilter || search
+              ? "No delivery drivers match your current search or availability filter."
+              : "No delivery agents have registered in the platform yet."
+          }
+        />
       ) : (
         <div className="rounded-2xl border border-gray-200 bg-white overflow-hidden shadow-xs">
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
+            <table className="min-w-full text-left text-sm">
               <thead className="border-b border-gray-200 bg-gray-50 text-xs font-semibold uppercase tracking-wider text-gray-500">
                 <tr>
-                  <th className="py-3.5 px-4">Agent Name</th>
-                  <th className="py-3.5 px-4">Availability</th>
-                  <th className="py-3.5 px-4">Current Workload</th>
-                  <th className="py-3.5 px-4">Vehicle Specs</th>
-                  <th className="py-3.5 px-4">Assigned Zone</th>
-                  <th className="py-3.5 px-4 text-right">Action</th>
+                  <th scope="col" className="py-3.5 px-4">Agent Name</th>
+                  <th scope="col" className="py-3.5 px-4">Availability</th>
+                  <th scope="col" className="py-3.5 px-4">Current Workload</th>
+                  <th scope="col" className="py-3.5 px-4">Vehicle Specs</th>
+                  <th scope="col" className="py-3.5 px-4">Assigned Zone</th>
+                  <th scope="col" className="py-3.5 px-4 text-right">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -112,7 +128,7 @@ export default function AdminAgentsPage() {
                     <td className="py-3.5 px-4 text-right">
                       <Link
                         href={`/admin/agents/${agent.id}`}
-                        className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 transition"
+                        className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 focus-visible:outline-2 focus-visible:outline-purple-600 transition"
                       >
                         Edit Profile
                       </Link>
