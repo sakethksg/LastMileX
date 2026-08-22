@@ -23,6 +23,11 @@ export class RateCardService {
     // Sort slabs ascending by minWeight
     const sorted = [...slabs].sort((a, b) => a.minWeight - b.minWeight);
 
+    // Enforce first slab starts at 0
+    if (sorted[0].minWeight !== 0) {
+      throw new ValidationError(`First weight slab must start at minWeight 0, but starts at ${sorted[0].minWeight}`);
+    }
+
     for (let i = 0; i < sorted.length; i++) {
       const current = sorted[i];
 
@@ -41,12 +46,17 @@ export class RateCardService {
         throw new ValidationError(`perKgRate must be non-negative: ${current.perKgRate}`);
       }
 
-      // Check overlap with previous slab
+      // Check contiguous boundary with previous slab (no overlap, no gap)
       if (i > 0) {
         const previous = sorted[i - 1];
         if (current.minWeight < previous.maxWeight) {
           throw new ValidationError(
             `Overlapping weight slabs detected: slab [${previous.minWeight} - ${previous.maxWeight}] overlaps with [${current.minWeight} - ${current.maxWeight}]`
+          );
+        }
+        if (current.minWeight > previous.maxWeight) {
+          throw new ValidationError(
+            `Gap in weight slabs detected between [${previous.minWeight} - ${previous.maxWeight}] and [${current.minWeight} - ${current.maxWeight}]`
           );
         }
       }

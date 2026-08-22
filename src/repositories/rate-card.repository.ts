@@ -134,24 +134,41 @@ export class RateCardRepository {
     const targetDate = params.date ?? new Date();
 
     if (params.routeType === RouteType.INTRA_ZONE) {
-      // 1. Check zone-specific intra-zone card first, then global fallback
+      // 1. Check zone-specific intra-zone card first
+      if (params.sourceZoneId) {
+        const specificCard = await prisma.rateCard.findFirst({
+          where: {
+            customerType: params.customerType,
+            routeType: RouteType.INTRA_ZONE,
+            sourceZoneId: params.sourceZoneId,
+            isActive: true,
+            effectiveFrom: { lte: targetDate },
+            OR: [{ effectiveTo: null }, { effectiveTo: { gt: targetDate } }],
+          },
+          orderBy: [{ effectiveFrom: "desc" }, { createdAt: "desc" }],
+          include: {
+            weightSlabs: {
+              orderBy: { minWeight: "asc" },
+            },
+          },
+        });
+
+        if (specificCard) {
+          return specificCard;
+        }
+      }
+
+      // 2. Fallback to global intra-zone card (sourceZoneId is null)
       return prisma.rateCard.findFirst({
         where: {
           customerType: params.customerType,
           routeType: RouteType.INTRA_ZONE,
+          sourceZoneId: null,
           isActive: true,
           effectiveFrom: { lte: targetDate },
           OR: [{ effectiveTo: null }, { effectiveTo: { gt: targetDate } }],
-          AND: [
-            {
-              OR: [
-                { sourceZoneId: params.sourceZoneId },
-                { sourceZoneId: null },
-              ],
-            },
-          ],
         },
-        orderBy: [{ sourceZoneId: "desc" }, { effectiveFrom: "desc" }],
+        orderBy: [{ effectiveFrom: "desc" }, { createdAt: "desc" }],
         include: {
           weightSlabs: {
             orderBy: { minWeight: "asc" },
@@ -160,30 +177,44 @@ export class RateCardRepository {
       });
     }
 
-    // 2. Inter-zone: specific zone-pair first, then global fallback
+    // INTER_ZONE:
+    // 1. Check specific zone-pair card first
+    if (params.sourceZoneId && params.destinationZoneId) {
+      const specificPairCard = await prisma.rateCard.findFirst({
+        where: {
+          customerType: params.customerType,
+          routeType: RouteType.INTER_ZONE,
+          sourceZoneId: params.sourceZoneId,
+          destinationZoneId: params.destinationZoneId,
+          isActive: true,
+          effectiveFrom: { lte: targetDate },
+          OR: [{ effectiveTo: null }, { effectiveTo: { gt: targetDate } }],
+        },
+        orderBy: [{ effectiveFrom: "desc" }, { createdAt: "desc" }],
+        include: {
+          weightSlabs: {
+            orderBy: { minWeight: "asc" },
+          },
+        },
+      });
+
+      if (specificPairCard) {
+        return specificPairCard;
+      }
+    }
+
+    // 2. Fallback to global inter-zone card (sourceZoneId and destinationZoneId are null)
     return prisma.rateCard.findFirst({
       where: {
         customerType: params.customerType,
         routeType: RouteType.INTER_ZONE,
+        sourceZoneId: null,
+        destinationZoneId: null,
         isActive: true,
         effectiveFrom: { lte: targetDate },
         OR: [{ effectiveTo: null }, { effectiveTo: { gt: targetDate } }],
-        AND: [
-          {
-            OR: [
-              {
-                sourceZoneId: params.sourceZoneId,
-                destinationZoneId: params.destinationZoneId,
-              },
-              {
-                sourceZoneId: null,
-                destinationZoneId: null,
-              },
-            ],
-          },
-        ],
       },
-      orderBy: [{ sourceZoneId: "desc" }, { effectiveFrom: "desc" }],
+      orderBy: [{ effectiveFrom: "desc" }, { createdAt: "desc" }],
       include: {
         weightSlabs: {
           orderBy: { minWeight: "asc" },
