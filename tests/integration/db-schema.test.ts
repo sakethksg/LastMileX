@@ -6,6 +6,7 @@ import {
   AgentAvailability,
   RouteType,
   SurchargeType,
+  PaymentType,
   OrderStatus,
   AssignmentType,
   AssignmentStatus,
@@ -48,6 +49,9 @@ describe("Database Schema & Model Integrity Verification", () => {
 
     // Surcharge Types
     expect(Object.values(SurchargeType)).toEqual(["FLAT", "PERCENTAGE"]);
+
+    // Payment Types
+    expect(Object.values(PaymentType)).toEqual(["PREPAID", "COD"]);
 
     // Order Lifecycle States (10 states)
     expect(Object.values(OrderStatus)).toEqual([

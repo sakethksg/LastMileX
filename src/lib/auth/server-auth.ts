@@ -20,17 +20,18 @@ export async function getCurrentUser(): Promise<AuthUserContext | null> {
 
     // Lazy Idempotent Auto-Provisioning:
     // If the authenticated Supabase user exists in auth.users but is missing in public.users,
-    // provision the application User and default CustomerProfile atomically.
+    // provision the application User strictly as CUSTOMER with a default CustomerProfile.
+    // Self-assigned or metadata roles (such as user_metadata.role = "ADMIN") are explicitly ignored
+    // to prevent privilege escalation.
     if (!appUser) {
       const name =
-        (authUser.user_metadata?.name as string | undefined) ||
-        (authUser.user_metadata?.full_name as string | undefined) ||
+        (typeof authUser.user_metadata?.name === "string" && authUser.user_metadata.name) ||
+        (typeof authUser.user_metadata?.full_name === "string" && authUser.user_metadata.full_name) ||
         authUser.email.split("@")[0] ||
         "Customer";
 
-      const requestedRole = (authUser.user_metadata?.role as UserRole | undefined) || UserRole.CUSTOMER;
-      // Default to CUSTOMER unless explicitly verified
-      const role = Object.values(UserRole).includes(requestedRole) ? requestedRole : UserRole.CUSTOMER;
+      // Privilege Escalation Prevention: All public / lazy provisioning defaults strictly to CUSTOMER
+      const role = UserRole.CUSTOMER;
 
       appUser = await userRepository.upsertUserWithProfile({
         id: authUser.id,
@@ -38,12 +39,9 @@ export async function getCurrentUser(): Promise<AuthUserContext | null> {
         name,
         role,
         emailVerified: Boolean(authUser.email_confirmed_at),
-        customerProfile:
-          role === UserRole.CUSTOMER
-            ? {
-                customerType: CustomerType.B2C,
-              }
-            : undefined,
+        customerProfile: {
+          customerType: CustomerType.B2C,
+        },
       });
     }
 

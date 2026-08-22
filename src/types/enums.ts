@@ -4,6 +4,7 @@ export {
   AgentAvailability,
   RouteType,
   SurchargeType,
+  PaymentType,
   OrderStatus,
   AssignmentType,
   AssignmentStatus,

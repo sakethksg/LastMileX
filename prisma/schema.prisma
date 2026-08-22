@@ -49,6 +49,13 @@ enum SurchargeType {
   @@map("surcharge_type")
 }
 
+enum PaymentType {
+  PREPAID
+  COD
+
+  @@map("payment_type")
+}
+
 enum OrderStatus {
   CREATED
   CONFIRMED
@@ -312,7 +319,7 @@ model Order {
   actualWeight          Decimal      @map("actual_weight") @db.Decimal(10, 2)
   volumetricWeight      Decimal      @map("volumetric_weight") @db.Decimal(10, 2)
   chargeableWeight      Decimal      @map("chargeable_weight") @db.Decimal(10, 2)
-  paymentType           String       @map("payment_type") // PREPAID or COD
+  paymentType           PaymentType  @map("payment_type")
   totalCharge           Decimal      @map("total_charge") @db.Decimal(10, 2)
   baseCharge            Decimal      @map("base_charge") @db.Decimal(10, 2)
   codSurcharge          Decimal      @default(0) @map("cod_surcharge") @db.Decimal(10, 2)
