@@ -2,6 +2,10 @@ import {
   UserRole,
   CustomerType,
   AgentAvailability,
+  PaymentType,
+  RouteType,
+  OrderStatus,
+  NotificationStatus,
 } from "./enums";
 
 export interface AuthUserContext {
@@ -38,4 +42,118 @@ export interface UserWithProfile {
     vehicleNumber: string | null;
     activeDeliveryCount: number;
   } | null;
+}
+
+export interface CalculateQuoteInput {
+  pickupAddress: string;
+  pickupPinCode: string;
+  dropAddress: string;
+  dropPinCode: string;
+  packageLength: number;
+  packageBreadth: number;
+  packageHeight: number;
+  actualWeight: number;
+  customerType?: CustomerType;
+  paymentType?: PaymentType;
+  codAmount?: number;
+}
+
+export interface QuoteBreakdown {
+  pickupZone: {
+    id: string;
+    code: string;
+    name: string;
+  };
+  dropZone: {
+    id: string;
+    code: string;
+    name: string;
+  };
+  routeType: RouteType;
+  customerType: CustomerType;
+  paymentType: PaymentType;
+  actualWeight: number;
+  volumetricWeight: number;
+  chargeableWeight: number;
+  rateCardId: string;
+  rateCardName: string;
+  weightSlabId: string;
+  deliveryCharge: number;
+  codSurcharge: number;
+  totalCharge: number;
+  currency: string;
+}
+
+export interface CustomerDashboardData {
+  overview: {
+    totalOrders: number;
+    activeOrders: number;
+    deliveredOrders: number;
+    failedOrders: number;
+    cancelledOrders: number;
+    unreadNotificationsCount: number;
+  };
+  activeDeliveries: any[];
+  recentOrders: any[];
+}
+
+export interface AgentDashboardData {
+  profile: {
+    id: string;
+    name: string;
+    email: string;
+    phone: string | null;
+    availability: AgentAvailability;
+    currentZoneId: string | null;
+    activeDeliveryCount: number;
+    maxConcurrentOrders: number;
+    capacityRemaining: number;
+    atCapacity: boolean;
+    vehicleType: string | null;
+    vehicleNumber: string | null;
+  };
+  activeOrders: any[];
+  metrics: {
+    today: {
+      completed: number;
+      failed: number;
+    };
+    allTime: {
+      completed: number;
+      failed: number;
+    };
+    successRate: number;
+  };
+}
+
+export interface AdminDashboardData {
+  orders: {
+    total: number;
+    active: number;
+    delivered: number;
+    failed: number;
+    cancelled: number;
+    statusBreakdown: Record<string, number>;
+  };
+  deliveryPerformance: {
+    todayCompleted: number;
+    todayFailed: number;
+    totalDelivered: number;
+    totalFailed: number;
+    successRate: number;
+  };
+  agentFleet: {
+    totalAgents: number;
+    available: number;
+    busy: number;
+    offline: number;
+    atCapacity: number;
+  };
+  financialMetrics: {
+    totalOrderValue: number;
+    deliveredOrderValue: number;
+    codExpectedValue: number;
+  };
+  recentOrders: any[];
+  recentFailures: any[];
 }
