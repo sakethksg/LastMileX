@@ -1,0 +1,476 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ------------------------------------------------------
+// Enums
+// ------------------------------------------------------
+
+enum UserRole {
+  CUSTOMER
+  DELIVERY_AGENT
+  ADMIN
+
+  @@map("user_role")
+}
+
+enum CustomerType {
+  B2B
+  B2C
+
+  @@map("customer_type")
+}
+
+enum AgentAvailability {
+  AVAILABLE
+  BUSY
+  OFFLINE
+
+  @@map("agent_availability")
+}
+
+enum RouteType {
+  INTRA_ZONE
+  INTER_ZONE
+
+  @@map("route_type")
+}
+
+enum SurchargeType {
+  FLAT
+  PERCENTAGE
+
+  @@map("surcharge_type")
+}
+
+enum OrderStatus {
+  CREATED
+  CONFIRMED
+  ASSIGNED
+  PICKED_UP
+  IN_TRANSIT
+  OUT_FOR_DELIVERY
+  DELIVERED
+  FAILED
+  CANCELLED
+  RESCHEDULED
+
+  @@map("order_status")
+}
+
+enum AssignmentType {
+  MANUAL
+  AUTO
+
+  @@map("assignment_type")
+}
+
+enum AssignmentStatus {
+  ACTIVE
+  COMPLETED
+  REASSIGNED
+  CANCELLED
+
+  @@map("assignment_status")
+}
+
+enum AttemptStatus {
+  PENDING
+  IN_PROGRESS
+  DELIVERED
+  FAILED
+  CANCELLED
+
+  @@map("attempt_status")
+}
+
+enum NotificationType {
+  EMAIL
+  SMS
+
+  @@map("notification_type")
+}
+
+enum NotificationEventType {
+  ORDER_CONFIRMED
+  ASSIGNED
+  PICKED_UP
+  IN_TRANSIT
+  OUT_FOR_DELIVERY
+  DELIVERED
+  FAILED
+  RESCHEDULED
+  ORDER_CANCELLED
+
+  @@map("notification_event_type")
+}
+
+enum NotificationStatus {
+  PENDING
+  SENT
+  FAILED
+  RETRYING
+
+  @@map("notification_status")
+}
+
+// ------------------------------------------------------
+// Models
+// ------------------------------------------------------
+
+model User {
+  id            String    @id @default(uuid()) @db.Uuid
+  email         String    @unique
+  role          UserRole  @default(CUSTOMER)
+  name          String
+  phone         String?
+  emailVerified Boolean   @default(false) @map("email_verified")
+  isActive      Boolean   @default(true) @map("is_active")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  customerProfile       CustomerProfile?
+  deliveryAgentProfile  DeliveryAgentProfile?
+  
+  customerOrders        Order[]                 @relation("CustomerOrders")
+  createdOrders         Order[]                 @relation("CreatedByOrders")
+  assignedAgentOrders   AgentAssignment[]       @relation("AssignedAgent")
+  assignedByOrders      AgentAssignment[]       @relation("AssignedBy")
+  agentDeliveryAttempts DeliveryAttempt[]       @relation("AgentAttempts")
+  rescheduledAttempts   DeliveryAttempt[]       @relation("RescheduledBy")
+  trackingEvents        OrderTrackingEvent[]    @relation("ActorTrackingEvents")
+  notifications         Notification[]
+
+  @@index([role])
+  @@index([email])
+  @@map("users")
+}
+
+model CustomerProfile {
+  id                   String       @id @default(uuid()) @db.Uuid
+  userId               String       @unique @map("user_id") @db.Uuid
+  defaultPickupAddress String?      @map("default_pickup_address")
+  defaultPickupPinCode String?      @map("default_pickup_pin_code")
+  companyName          String?      @map("company_name")
+  customerType         CustomerType @default(B2C) @map("customer_type")
+  createdAt            DateTime     @default(now()) @map("created_at")
+  updatedAt            DateTime     @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("customer_profiles")
+}
+
+model DeliveryAgentProfile {
+  id                   String            @id @default(uuid()) @db.Uuid
+  userId               String            @unique @map("user_id") @db.Uuid
+  availability         AgentAvailability @default(OFFLINE)
+  currentZoneId        String?           @map("current_zone_id") @db.Uuid
+  maxConcurrentOrders  Int               @default(5) @map("max_concurrent_orders")
+  vehicleType          String?           @map("vehicle_type")
+  vehicleNumber        String?           @map("vehicle_number")
+  lastKnownLatitude    Decimal?          @map("last_known_latitude") @db.Decimal(10, 7)
+  lastKnownLongitude   Decimal?          @map("last_known_longitude") @db.Decimal(10, 7)
+  lastLocationUpdateAt DateTime?         @map("last_location_update_at")
+  activeDeliveryCount  Int               @default(0) @map("active_delivery_count")
+  createdAt            DateTime          @default(now()) @map("created_at")
+  updatedAt            DateTime          @updatedAt @map("updated_at")
+
+  user        User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  currentZone Zone? @relation(fields: [currentZoneId], references: [id], onDelete: SetNull)
+
+  @@index([availability])
+  @@index([currentZoneId])
+  @@index([availability, currentZoneId])
+  @@map("delivery_agent_profiles")
+}
+
+model Zone {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String   @unique
+  code        String   @unique
+  description String?
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  serviceAreas           ServiceArea[]
+  sourceRateCards        RateCard[]             @relation("SourceZoneRateCards")
+  destinationRateCards   RateCard[]             @relation("DestinationZoneRateCards")
+  pickupOrders           Order[]                @relation("PickupZoneOrders")
+  dropOrders             Order[]                @relation("DropZoneOrders")
+  deliveryAgentProfiles  DeliveryAgentProfile[]
+
+  @@index([code])
+  @@index([isActive])
+  @@map("zones")
+}
+
+model ServiceArea {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String
+  pinCode   String   @unique @map("pin_code")
+  locality  String?
+  city      String?
+  state     String?
+  zoneId    String   @map("zone_id") @db.Uuid
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  zone Zone @relation(fields: [zoneId], references: [id], onDelete: Restrict)
+
+  @@index([pinCode])
+  @@index([zoneId])
+  @@index([pinCode, isActive])
+  @@map("service_areas")
+}
+
+model RateCard {
+  id                String       @id @default(uuid()) @db.Uuid
+  name              String
+  customerType      CustomerType @map("customer_type")
+  routeType         RouteType    @map("route_type")
+  sourceZoneId      String?      @map("source_zone_id") @db.Uuid
+  destinationZoneId String?      @map("destination_zone_id") @db.Uuid
+  effectiveFrom     DateTime     @map("effective_from")
+  effectiveTo       DateTime?    @map("effective_to")
+  isActive          Boolean      @default(true) @map("is_active")
+  createdAt         DateTime     @default(now()) @map("created_at")
+  updatedAt         DateTime     @updatedAt @map("updated_at")
+
+  sourceZone          Zone?                  @relation("SourceZoneRateCards", fields: [sourceZoneId], references: [id], onDelete: Restrict)
+  destinationZone     Zone?                  @relation("DestinationZoneRateCards", fields: [destinationZoneId], references: [id], onDelete: Restrict)
+  weightSlabs         WeightSlab[]
+  pricingSnapshots    OrderPricingSnapshot[]
+
+  @@unique([customerType, routeType, sourceZoneId, destinationZoneId, effectiveFrom])
+  @@index([customerType, routeType, isActive, effectiveFrom])
+  @@index([sourceZoneId])
+  @@index([destinationZoneId])
+  @@map("rate_cards")
+}
+
+model WeightSlab {
+  id         String   @id @default(uuid()) @db.Uuid
+  rateCardId String   @map("rate_card_id") @db.Uuid
+  minWeight  Decimal  @map("min_weight") @db.Decimal(10, 2)
+  maxWeight  Decimal  @map("max_weight") @db.Decimal(10, 2)
+  basePrice  Decimal  @map("base_price") @db.Decimal(10, 2)
+  perKgRate  Decimal  @default(0) @map("per_kg_rate") @db.Decimal(10, 2)
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  rateCard         RateCard               @relation(fields: [rateCardId], references: [id], onDelete: Cascade)
+  pricingSnapshots OrderPricingSnapshot[]
+
+  @@index([rateCardId])
+  @@index([rateCardId, minWeight])
+  @@map("weight_slabs")
+}
+
+model CodSurcharge {
+  id             String        @id @default(uuid()) @db.Uuid
+  routeType      RouteType     @map("route_type")
+  surchargeType  SurchargeType @map("surcharge_type")
+  surchargeValue Decimal       @map("surcharge_value") @db.Decimal(10, 2)
+  minSurcharge   Decimal?      @map("min_surcharge") @db.Decimal(10, 2)
+  maxSurcharge   Decimal?      @map("max_surcharge") @db.Decimal(10, 2)
+  isActive       Boolean       @default(true) @map("is_active")
+  effectiveFrom  DateTime      @map("effective_from")
+  effectiveTo    DateTime?     @map("effective_to")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+
+  pricingSnapshots OrderPricingSnapshot[]
+
+  @@index([routeType, isActive, effectiveFrom])
+  @@map("cod_surcharges")
+}
+
+model Order {
+  id                    String       @id @default(uuid()) @db.Uuid
+  orderNumber           String       @unique @map("order_number")
+  customerId            String       @map("customer_id") @db.Uuid
+  customerType          CustomerType @map("customer_type")
+  status                OrderStatus  @default(CREATED)
+  pickupAddress         String       @map("pickup_address")
+  pickupPinCode         String       @map("pickup_pin_code")
+  pickupZoneId          String       @map("pickup_zone_id") @db.Uuid
+  dropAddress           String       @map("drop_address")
+  dropPinCode           String       @map("drop_pin_code")
+  dropZoneId            String       @map("drop_zone_id") @db.Uuid
+  routeType             RouteType    @map("route_type")
+  packageLength         Decimal      @map("package_length") @db.Decimal(10, 2)
+  packageBreadth        Decimal      @map("package_breadth") @db.Decimal(10, 2)
+  packageHeight         Decimal      @map("package_height") @db.Decimal(10, 2)
+  actualWeight          Decimal      @map("actual_weight") @db.Decimal(10, 2)
+  volumetricWeight      Decimal      @map("volumetric_weight") @db.Decimal(10, 2)
+  chargeableWeight      Decimal      @map("chargeable_weight") @db.Decimal(10, 2)
+  paymentType           String       @map("payment_type") // PREPAID or COD
+  totalCharge           Decimal      @map("total_charge") @db.Decimal(10, 2)
+  baseCharge            Decimal      @map("base_charge") @db.Decimal(10, 2)
+  codSurcharge          Decimal      @default(0) @map("cod_surcharge") @db.Decimal(10, 2)
+  scheduledDeliveryDate DateTime?    @map("scheduled_delivery_date")
+  currentAttempt        Int          @default(1) @map("current_attempt")
+  maxAttempts           Int          @default(3) @map("max_attempts")
+  notes                 String?
+  createdById           String       @map("created_by_id") @db.Uuid
+  createdAt             DateTime     @default(now()) @map("created_at")
+  updatedAt             DateTime     @updatedAt @map("updated_at")
+
+  customer        User                  @relation("CustomerOrders", fields: [customerId], references: [id], onDelete: Restrict)
+  createdBy       User                  @relation("CreatedByOrders", fields: [createdById], references: [id], onDelete: Restrict)
+  pickupZone      Zone                  @relation("PickupZoneOrders", fields: [pickupZoneId], references: [id], onDelete: Restrict)
+  dropZone        Zone                  @relation("DropZoneOrders", fields: [dropZoneId], references: [id], onDelete: Restrict)
+  
+  pricingSnapshot OrderPricingSnapshot?
+  assignments     AgentAssignment[]
+  attempts        DeliveryAttempt[]
+  trackingEvents  OrderTrackingEvent[]
+  notifications   Notification[]
+
+  @@index([orderNumber])
+  @@index([customerId])
+  @@index([status])
+  @@index([pickupZoneId])
+  @@index([dropZoneId])
+  @@index([customerId, status])
+  @@index([status, createdAt])
+  @@index([createdAt])
+  @@map("orders")
+}
+
+model OrderPricingSnapshot {
+  id                   String        @id @default(uuid()) @db.Uuid
+  orderId              String        @unique @map("order_id") @db.Uuid
+  rateCardId           String        @map("rate_card_id") @db.Uuid
+  rateCardName         String        @map("rate_card_name")
+  customerType         CustomerType  @map("customer_type")
+  routeType            RouteType     @map("route_type")
+  weightSlabId         String        @map("weight_slab_id") @db.Uuid
+  minWeight            Decimal       @map("min_weight") @db.Decimal(10, 2)
+  maxWeight            Decimal       @map("max_weight") @db.Decimal(10, 2)
+  basePrice            Decimal       @map("base_price") @db.Decimal(10, 2)
+  perKgRate            Decimal       @map("per_kg_rate") @db.Decimal(10, 2)
+  chargeableWeight     Decimal       @map("chargeable_weight") @db.Decimal(10, 2)
+  baseCharge           Decimal       @map("base_charge") @db.Decimal(10, 2)
+  codSurchargeRuleId   String?       @map("cod_surcharge_rule_id") @db.Uuid
+  codSurchargeType     SurchargeType? @map("cod_surcharge_type")
+  codSurchargeValue    Decimal?      @map("cod_surcharge_value") @db.Decimal(10, 2)
+  codSurchargeAmount   Decimal       @default(0) @map("cod_surcharge_amount") @db.Decimal(10, 2)
+  totalCharge          Decimal       @map("total_charge") @db.Decimal(10, 2)
+  snapshotData         Json          @map("snapshot_data")
+  createdAt            DateTime      @default(now()) @map("created_at")
+
+  order                Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  rateCard             RateCard      @relation(fields: [rateCardId], references: [id], onDelete: Restrict)
+  weightSlab           WeightSlab    @relation(fields: [weightSlabId], references: [id], onDelete: Restrict)
+  codSurchargeRule     CodSurcharge? @relation(fields: [codSurchargeRuleId], references: [id], onDelete: SetNull)
+
+  @@index([orderId])
+  @@map("order_pricing_snapshots")
+}
+
+model AgentAssignment {
+  id             String           @id @default(uuid()) @db.Uuid
+  orderId        String           @map("order_id") @db.Uuid
+  agentId        String           @map("agent_id") @db.Uuid
+  assignedAt     DateTime         @default(now()) @map("assigned_at")
+  assignedById   String           @map("assigned_by_id") @db.Uuid
+  assignmentType AssignmentType   @default(MANUAL) @map("assignment_type")
+  status         AssignmentStatus @default(ACTIVE)
+  completedAt    DateTime?        @map("completed_at")
+  attemptNumber  Int              @default(1) @map("attempt_number")
+  notes          String?
+  createdAt      DateTime         @default(now()) @map("created_at")
+
+  order      Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  agent      User  @relation("AssignedAgent", fields: [agentId], references: [id], onDelete: Restrict)
+  assignedBy User  @relation("AssignedBy", fields: [assignedById], references: [id], onDelete: Restrict)
+
+  @@index([orderId])
+  @@index([agentId])
+  @@index([agentId, status])
+  @@index([orderId, status])
+  @@map("agent_assignments")
+}
+
+model DeliveryAttempt {
+  id              String        @id @default(uuid()) @db.Uuid
+  orderId         String        @map("order_id") @db.Uuid
+  attemptNumber   Int           @map("attempt_number")
+  agentId         String?       @map("agent_id") @db.Uuid
+  status          AttemptStatus @default(PENDING)
+  scheduledDate   DateTime      @map("scheduled_date")
+  failureReason   String?       @map("failure_reason")
+  failedAt        DateTime?     @map("failed_at")
+  completedAt     DateTime?     @map("completed_at")
+  rescheduledById String?       @map("rescheduled_by_id") @db.Uuid
+  rescheduledAt   DateTime?     @map("rescheduled_at")
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+
+  order         Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  agent         User? @relation("AgentAttempts", fields: [agentId], references: [id], onDelete: SetNull)
+  rescheduledBy User? @relation("RescheduledBy", fields: [rescheduledById], references: [id], onDelete: SetNull)
+
+  @@unique([orderId, attemptNumber])
+  @@index([orderId])
+  @@index([agentId])
+  @@map("delivery_attempts")
+}
+
+model OrderTrackingEvent {
+  id             String       @id @default(uuid()) @db.Uuid
+  orderId        String       @map("order_id") @db.Uuid
+  previousStatus OrderStatus? @map("previous_status")
+  newStatus      OrderStatus  @map("new_status")
+  timestamp      DateTime     @default(now())
+  actorId        String       @map("actor_id") @db.Uuid
+  actorRole      UserRole     @map("actor_role")
+  note           String?
+  metadata       Json?
+  createdAt      DateTime     @default(now()) @map("created_at")
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  actor User  @relation("ActorTrackingEvents", fields: [actorId], references: [id], onDelete: Restrict)
+
+  @@index([orderId])
+  @@index([orderId, timestamp])
+  @@index([actorId])
+  @@map("order_tracking_events")
+}
+
+model Notification {
+  id                String                @id @default(uuid()) @db.Uuid
+  userId            String                @map("user_id") @db.Uuid
+  orderId           String?               @map("order_id") @db.Uuid
+  type              NotificationType
+  channel           String
+  eventType         NotificationEventType @map("event_type")
+  subject           String
+  body              String
+  status            NotificationStatus    @default(PENDING)
+  providerMessageId String?               @map("provider_message_id")
+  errorMessage      String?               @map("error_message")
+  retryCount        Int                   @default(0) @map("retry_count")
+  maxRetries        Int                   @default(3) @map("max_retries")
+  sentAt            DateTime?             @map("sent_at")
+  createdAt         DateTime              @default(now()) @map("created_at")
+  updatedAt         DateTime              @updatedAt @map("updated_at")
+
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  order Order? @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([orderId])
+  @@index([status])
+  @@index([status, createdAt])
+  @@map("notifications")
+}
