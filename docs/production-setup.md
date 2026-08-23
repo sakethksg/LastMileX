@@ -57,8 +57,22 @@ cp .env.example .env.production
    npx prisma migrate deploy
    ```
 
-4. **Verify Seed Data (Zones, Surcharges, Rate Cards)**:
-   Ensure initial zones, service areas, rate cards, and weight slabs are provisioned before accepting customer shipment orders.
+4. **Seed and verify remote data**:
+   ```bash
+   npm run db:seed
+   npm run db:verify-seed
+   ```
+   The seed is idempotent and provisions Auth-linked persona users, zones,
+   service areas, rate cards, slabs, COD rules, and deterministic lifecycle
+   orders covering created, assigned, in-progress, delivered, failed, and
+   rescheduled states. Verification fails on missing pricing snapshots,
+   invalid attempt history, invalid terminal state records, or workload
+   mismatches.
+
+   Seed passwords are optional local configuration used only when a persona
+   Auth user does not already exist. Keep `SEED_*_PASSWORD` values outside
+   source control and run `npm run auth:verify` only in an environment where
+   those values are supplied securely.
 
 ---
 

@@ -107,7 +107,26 @@ cp .env.example .env
 npx prisma validate
 npx prisma generate
 npx prisma migrate dev
+npx prisma migrate status
+npm run db:seed
+npm run db:verify-seed
 ```
+
+The seed command creates or reuses the three Supabase Auth persona users, then
+creates geography, pricing, and deterministic lifecycle fixtures. It is
+idempotent: existing fixture order numbers are skipped on later runs. Seed
+passwords are needed only when a new Auth user must be created; provide them
+through local, ignored environment variables such as `SEED_ADMIN_PASSWORD`.
+Never commit seed passwords, service-role keys, or database URLs.
+
+To optionally verify password login for each persona, set the three
+`SEED_*_PASSWORD` variables locally and run:
+
+```bash
+npm run auth:verify
+```
+
+Without those variables, the Auth check skips login attempts by design.
 
 ### 4. Running the Application
 ```bash
