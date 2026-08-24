@@ -25,20 +25,20 @@ export function EmptyState({
     <div
       role="region"
       aria-label={title}
-      className={`rounded-2xl border border-gray-200 bg-white p-10 sm:p-12 text-center shadow-xs ${className}`}
+      className={`rounded-lg border border-hairline bg-surface-1 p-10 sm:p-12 text-center ${className}`}
     >
-      <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gray-50 text-gray-400 border border-gray-100">
-        {icon || <Package className="h-7 w-7 text-gray-400" aria-hidden="true" />}
+      <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-md bg-surface-2 text-ink-muted border border-hairline-soft">
+        {icon || <Package className="h-6 w-6 text-ink-muted" aria-hidden="true" />}
       </div>
-      <h3 className="mt-4 text-base font-bold text-gray-900">{title}</h3>
-      <p className="mt-1 text-sm text-gray-500 max-w-sm mx-auto">{description}</p>
+      <h3 className="mt-4 text-card-title font-semibold text-ink">{title}</h3>
+      <p className="mt-1 text-sm text-ink-muted max-w-sm mx-auto leading-relaxed">{description}</p>
 
       {actionText && (actionHref || onAction) && (
         <div className="mt-6">
           {actionHref ? (
             <Link
               href={actionHref}
-              className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-xs hover:bg-blue-700 focus-visible:outline-2 focus-visible:outline-blue-600 transition"
+              className="btn-primary"
             >
               {actionText}
             </Link>
@@ -46,7 +46,7 @@ export function EmptyState({
             <button
               type="button"
               onClick={onAction}
-              className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-xs hover:bg-blue-700 focus-visible:outline-2 focus-visible:outline-blue-600 transition"
+              className="btn-primary"
             >
               {actionText}
             </button>

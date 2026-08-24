@@ -95,6 +95,7 @@ export default function AgentOrderExecutionPage({ params }: { params: Promise<{ 
     return (
       <div className="space-y-4">
         <PageHeader
+          eyebrow="Route Execution"
           title="Delivery Execution"
           backHref="/agent/orders"
           backLabel="Back to Assigned Deliveries"
@@ -111,6 +112,7 @@ export default function AgentOrderExecutionPage({ params }: { params: Promise<{ 
   return (
     <div className="space-y-8 max-w-4xl mx-auto">
       <PageHeader
+        eyebrow="Driver Execution"
         title={order.orderNumber}
         subtitle={`Current Attempt: #${order.currentAttempt || 1} of ${order.maxAttempts || 3}`}
         backHref="/agent/orders"
@@ -127,10 +129,13 @@ export default function AgentOrderExecutionPage({ params }: { params: Promise<{ 
       )}
 
       {/* STATE-DRIVEN EXECUTION ACTION BAR */}
-      <section aria-label="Delivery actions" className="rounded-2xl border-2 border-blue-200 bg-blue-50/60 p-6 shadow-xs space-y-4">
-        <h2 className="text-sm font-bold uppercase tracking-wider text-blue-900">
-          Delivery State Actions
-        </h2>
+      <section aria-label="Delivery actions" className="card-surface-1 !border-product-waypoint/40 space-y-4">
+        <div className="flex items-center justify-between border-b border-hairline-soft pb-2">
+          <h2 className="text-eyebrow font-semibold uppercase tracking-eyebrow text-product-waypoint">
+            Lifecycle Transition Actions
+          </h2>
+          <span className="text-[11px] font-mono text-ink-subtle">FSM Active</span>
+        </div>
 
         <div className="flex flex-wrap items-center gap-3">
           {order.status === OrderStatus.ASSIGNED && (
@@ -139,9 +144,9 @@ export default function AgentOrderExecutionPage({ params }: { params: Promise<{ 
               onClick={() => executeAction(() => pickupOrder(orderId))}
               disabled={actionLoading}
               aria-busy={actionLoading}
-              className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-bold text-white shadow-xs hover:bg-blue-700 disabled:opacity-50 transition focus-visible:outline-2 focus-visible:outline-blue-600"
+              className="btn-product-waypoint"
             >
-              {actionLoading ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Package className="h-4 w-4" aria-hidden="true" />}
+              {actionLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" aria-hidden="true" /> : <Package className="h-4 w-4 mr-2" aria-hidden="true" />}
               Confirm Package Pickup
             </button>
           )}
@@ -152,9 +157,9 @@ export default function AgentOrderExecutionPage({ params }: { params: Promise<{ 
               onClick={() => executeAction(() => startDelivery(orderId))}
               disabled={actionLoading}
               aria-busy={actionLoading}
-              className="inline-flex items-center gap-2 rounded-xl bg-purple-600 px-5 py-2.5 text-sm font-bold text-white shadow-xs hover:bg-purple-700 disabled:opacity-50 transition focus-visible:outline-2 focus-visible:outline-purple-600"
+              className="btn-product-terraform"
             >
-              {actionLoading ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Truck className="h-4 w-4" aria-hidden="true" />}
+              {actionLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" aria-hidden="true" /> : <Truck className="h-4 w-4 mr-2" aria-hidden="true" />}
               Start Transit / Hub Transfer
             </button>
           )}
@@ -165,9 +170,9 @@ export default function AgentOrderExecutionPage({ params }: { params: Promise<{ 
               onClick={() => executeAction(() => outForDelivery(orderId))}
               disabled={actionLoading}
               aria-busy={actionLoading}
-              className="inline-flex items-center gap-2 rounded-xl bg-amber-600 px-5 py-2.5 text-sm font-bold text-white shadow-xs hover:bg-amber-700 disabled:opacity-50 transition focus-visible:outline-2 focus-visible:outline-amber-600"
+              className="btn-product-vault"
             >
-              {actionLoading ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Navigation className="h-4 w-4" aria-hidden="true" />}
+              {actionLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" aria-hidden="true" /> : <Navigation className="h-4 w-4 mr-2" aria-hidden="true" />}
               Mark Out for Delivery
             </button>
           )}
@@ -179,9 +184,9 @@ export default function AgentOrderExecutionPage({ params }: { params: Promise<{ 
                 onClick={() => executeAction(() => completeDelivery(orderId))}
                 disabled={actionLoading}
                 aria-busy={actionLoading}
-                className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-6 py-2.5 text-sm font-bold text-white shadow-xs hover:bg-emerald-700 disabled:opacity-50 transition focus-visible:outline-2 focus-visible:outline-emerald-600"
+                className="btn-product-nomad"
               >
-                {actionLoading ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <CheckCircle2 className="h-4 w-4" aria-hidden="true" />}
+                {actionLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" aria-hidden="true" /> : <CheckCircle2 className="h-4 w-4 mr-2" aria-hidden="true" />}
                 Complete Delivery
               </button>
 
@@ -189,23 +194,23 @@ export default function AgentOrderExecutionPage({ params }: { params: Promise<{ 
                 type="button"
                 onClick={() => setIsFailing(true)}
                 disabled={actionLoading}
-                className="inline-flex items-center gap-2 rounded-xl bg-red-600 px-5 py-2.5 text-sm font-bold text-white shadow-xs hover:bg-red-700 disabled:opacity-50 transition focus-visible:outline-2 focus-visible:outline-red-600"
+                className="btn-product-consul"
               >
-                <AlertTriangle className="h-4 w-4" aria-hidden="true" />
+                <AlertTriangle className="h-4 w-4 mr-2" aria-hidden="true" />
                 Report Delivery Failure
               </button>
             </>
           )}
 
           {order.status === OrderStatus.DELIVERED && (
-            <div className="flex items-center gap-2 text-sm font-bold text-emerald-700 bg-emerald-100/70 px-4 py-2 rounded-xl">
+            <div className="flex items-center gap-2 text-sm font-semibold text-product-nomad bg-product-nomad/10 border border-product-nomad/30 px-4 py-2 rounded-md">
               <CheckCircle2 className="h-5 w-5" aria-hidden="true" />
               Delivery Successfully Completed
             </div>
           )}
 
           {order.status === OrderStatus.FAILED && (
-            <div className="flex items-center gap-2 text-sm font-bold text-red-700 bg-red-100/70 px-4 py-2 rounded-xl">
+            <div className="flex items-center gap-2 text-sm font-semibold text-product-consul bg-product-consul/10 border border-product-consul/30 px-4 py-2 rounded-md">
               <AlertTriangle className="h-5 w-5" aria-hidden="true" />
               Delivery Attempt Marked as Failed
             </div>
@@ -222,14 +227,14 @@ export default function AgentOrderExecutionPage({ params }: { params: Promise<{ 
       >
         <form onSubmit={handleReportFailure} className="space-y-4">
           <div>
-            <label htmlFor="agent-failure-reason" className="block text-xs font-semibold text-gray-700">
+            <label htmlFor="agent-failure-reason" className="block text-xs font-semibold text-ink-muted uppercase tracking-wider">
               Failure Reason
             </label>
             <select
               id="agent-failure-reason"
               value={failureReason}
               onChange={(e) => setFailureReason(e.target.value as DeliveryFailureReason)}
-              className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm text-gray-900 outline-hidden focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              className="input-surface mt-1 w-full text-sm"
             >
               <option value="CUSTOMER_UNAVAILABLE">Customer Unavailable</option>
               <option value="ADDRESS_NOT_FOUND">Address Not Found / Incorrect Address</option>
@@ -241,7 +246,7 @@ export default function AgentOrderExecutionPage({ params }: { params: Promise<{ 
           </div>
 
           <div>
-            <label htmlFor="agent-failure-notes" className="block text-xs font-semibold text-gray-700">
+            <label htmlFor="agent-failure-notes" className="block text-xs font-semibold text-ink-muted uppercase tracking-wider">
               Additional Operational Notes
             </label>
             <textarea
@@ -250,15 +255,15 @@ export default function AgentOrderExecutionPage({ params }: { params: Promise<{ 
               value={failureNotes}
               onChange={(e) => setFailureNotes(e.target.value)}
               placeholder="e.g., Gate locked, recipient unreachable after 3 call attempts..."
-              className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm text-gray-900 outline-hidden focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              className="input-surface mt-1 w-full text-sm"
             />
           </div>
 
-          <div className="flex justify-end gap-2 pt-2 border-t border-gray-100">
+          <div className="flex justify-end gap-2 pt-2 border-t border-hairline-soft">
             <button
               type="button"
               onClick={() => setIsFailing(false)}
-              className="rounded-lg border border-gray-300 px-4 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50 focus-visible:outline-2 focus-visible:outline-blue-600"
+              className="btn-secondary !px-4 !py-2 text-xs"
             >
               Cancel
             </button>
@@ -266,9 +271,9 @@ export default function AgentOrderExecutionPage({ params }: { params: Promise<{ 
               type="submit"
               disabled={actionLoading}
               aria-busy={actionLoading}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-red-600 px-4 py-2 text-xs font-semibold text-white hover:bg-red-700 disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-red-600"
+              className="btn-product-consul !px-4 !py-2 text-xs"
             >
-              {actionLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" /> : null}
+              {actionLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" aria-hidden="true" /> : null}
               Confirm Failure
             </button>
           </div>
@@ -277,45 +282,45 @@ export default function AgentOrderExecutionPage({ params }: { params: Promise<{ 
 
       {/* Package & Customer Details */}
       <div className="grid md:grid-cols-2 gap-6">
-        <section aria-label="Destination details" className="rounded-2xl border border-gray-200 bg-white p-6 shadow-xs space-y-4">
-          <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
-            <MapPin className="h-5 w-5 text-blue-600" aria-hidden="true" />
-            Destination & Customer Contact
+        <section aria-label="Destination details" className="card-surface-1 space-y-4">
+          <h2 className="text-base font-bold text-ink flex items-center gap-2">
+            <MapPin className="h-5 w-5 text-product-waypoint" aria-hidden="true" />
+            Destination & Location
           </h2>
 
           <div className="space-y-3 text-sm">
-            <div className="bg-gray-50 p-3 rounded-xl border border-gray-100">
-              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Drop Address</div>
-              <div className="font-medium text-gray-900 mt-0.5">{order.dropAddress}</div>
-              <div className="text-xs text-gray-500 mt-0.5">PIN Code: {order.dropPinCode}</div>
+            <div className="bg-surface-2 p-3 rounded-md border border-hairline">
+              <div className="text-eyebrow font-semibold uppercase text-ink-subtle">Drop Address</div>
+              <div className="font-medium text-ink mt-0.5">{order.dropAddress}</div>
+              <div className="text-xs text-ink-subtle font-mono mt-0.5">PIN Code: {order.dropPinCode}</div>
             </div>
 
-            <div className="bg-gray-50 p-3 rounded-xl border border-gray-100">
-              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Pickup Origin</div>
-              <div className="font-medium text-gray-900 mt-0.5">{order.pickupAddress}</div>
-              <div className="text-xs text-gray-500 mt-0.5">PIN Code: {order.pickupPinCode}</div>
+            <div className="bg-surface-2 p-3 rounded-md border border-hairline">
+              <div className="text-eyebrow font-semibold uppercase text-ink-subtle">Pickup Origin</div>
+              <div className="font-medium text-ink mt-0.5">{order.pickupAddress}</div>
+              <div className="text-xs text-ink-subtle font-mono mt-0.5">PIN Code: {order.pickupPinCode}</div>
             </div>
           </div>
         </section>
 
-        <section aria-label="Package specifications" className="rounded-2xl border border-gray-200 bg-white p-6 shadow-xs space-y-4">
-          <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
-            <Package className="h-5 w-5 text-blue-600" aria-hidden="true" />
+        <section aria-label="Package specifications" className="card-surface-1 space-y-4">
+          <h2 className="text-base font-bold text-ink flex items-center gap-2">
+            <Package className="h-5 w-5 text-product-terraform-bright" aria-hidden="true" />
             Package & Payment Specs
           </h2>
 
-          <div className="space-y-3 text-xs">
-            <div className="flex justify-between py-1.5 border-b border-gray-100">
-              <span className="text-gray-500">Payment Type</span>
-              <span className="font-bold text-gray-900">{order.paymentType}</span>
+          <div className="space-y-3 text-xs font-mono">
+            <div className="flex justify-between py-1.5 border-b border-hairline-soft">
+              <span className="text-ink-muted font-sans">Payment Type</span>
+              <span className="font-bold text-ink">{order.paymentType}</span>
             </div>
-            <div className="flex justify-between py-1.5 border-b border-gray-100">
-              <span className="text-gray-500">Package Weight</span>
-              <span className="font-bold text-gray-900">{order.actualWeight} kg</span>
+            <div className="flex justify-between py-1.5 border-b border-hairline-soft">
+              <span className="text-ink-muted font-sans">Package Weight</span>
+              <span className="font-bold text-product-waypoint">{order.actualWeight} kg</span>
             </div>
-            <div className="flex justify-between py-1.5 border-b border-gray-100">
-              <span className="text-gray-500">Dimensions</span>
-              <span className="font-bold text-gray-900">
+            <div className="flex justify-between py-1.5 border-b border-hairline-soft">
+              <span className="text-ink-muted font-sans">Dimensions</span>
+              <span className="font-bold text-ink">
                 {order.packageLength} x {order.packageBreadth} x {order.packageHeight} cm
               </span>
             </div>

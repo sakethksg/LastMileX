@@ -77,6 +77,7 @@ export default function AdminEditAgentPage({ params }: { params: Promise<{ id: s
     return (
       <div className="space-y-4">
         <PageHeader
+          eyebrow="Fleet Ops"
           title="Edit Driver Profile"
           backHref="/admin/agents"
           backLabel="Back to Agent Fleet"
@@ -93,6 +94,7 @@ export default function AdminEditAgentPage({ params }: { params: Promise<{ id: s
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       <PageHeader
+        eyebrow="Fleet Configuration"
         title="Edit Driver Profile"
         subtitle={`Managing ${agent?.user?.name || agent?.user?.email} (Current Workload: ${agent?.activeDeliveryCount || 0} active orders)`}
         backHref="/admin/agents"
@@ -108,22 +110,22 @@ export default function AdminEditAgentPage({ params }: { params: Promise<{ id: s
       )}
 
       {success && (
-        <div role="status" className="flex items-center gap-2.5 rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-700">
+        <div role="status" className="flex items-center gap-2.5 rounded-md border border-product-nomad/30 bg-product-nomad/10 p-4 text-sm text-product-nomad">
           <CheckCircle2 className="h-5 w-5 shrink-0" aria-hidden="true" />
           <span>Agent profile updated successfully.</span>
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="rounded-2xl border border-gray-200 bg-white p-6 shadow-xs space-y-6">
+      <form onSubmit={handleSubmit} className="card-surface-1 space-y-6">
         <div>
-          <label htmlFor="agent-edit-availability" className="block text-xs font-semibold uppercase tracking-wider text-gray-700">
+          <label htmlFor="agent-edit-availability" className="block text-xs font-semibold uppercase tracking-wider text-ink-muted">
             Availability Status
           </label>
           <select
             id="agent-edit-availability"
             value={availability}
             onChange={(e) => setAvailability(e.target.value as AgentAvailability)}
-            className="mt-1 w-full rounded-lg border border-gray-300 p-2.5 text-sm text-gray-900 outline-hidden focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+            className="input-surface mt-1 w-full text-sm"
           >
             <option value={AgentAvailability.AVAILABLE}>AVAILABLE</option>
             <option value={AgentAvailability.BUSY}>BUSY</option>
@@ -132,7 +134,7 @@ export default function AdminEditAgentPage({ params }: { params: Promise<{ id: s
         </div>
 
         <div>
-          <label htmlFor="agent-edit-capacity" className="block text-xs font-semibold uppercase tracking-wider text-gray-700">
+          <label htmlFor="agent-edit-capacity" className="block text-xs font-semibold uppercase tracking-wider text-ink-muted">
             Maximum Concurrent Orders (1 - 50)
           </label>
           <input
@@ -143,16 +145,16 @@ export default function AdminEditAgentPage({ params }: { params: Promise<{ id: s
             required
             value={maxConcurrentOrders}
             onChange={(e) => setMaxConcurrentOrders(Number(e.target.value))}
-            className="mt-1 w-full rounded-lg border border-gray-300 p-2.5 text-sm text-gray-900 outline-hidden focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+            className="input-surface mt-1 w-full text-sm font-mono"
           />
-          <p className="text-[11px] text-gray-400 mt-1">
+          <p className="text-[11px] text-ink-subtle mt-1 font-mono">
             Note: Active delivery count is automatically managed by the dispatch state machine.
           </p>
         </div>
 
         <div className="grid sm:grid-cols-2 gap-4">
           <div>
-            <label htmlFor="agent-edit-vehicle-type" className="block text-xs font-semibold uppercase tracking-wider text-gray-700">
+            <label htmlFor="agent-edit-vehicle-type" className="block text-xs font-semibold uppercase tracking-wider text-ink-muted">
               Vehicle Type
             </label>
             <input
@@ -161,12 +163,12 @@ export default function AdminEditAgentPage({ params }: { params: Promise<{ id: s
               value={vehicleType}
               onChange={(e) => setVehicleType(e.target.value)}
               placeholder="e.g. BIKE, VAN, TRUCK"
-              className="mt-1 w-full rounded-lg border border-gray-300 p-2.5 text-sm text-gray-900 outline-hidden focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+              className="input-surface mt-1 w-full text-sm"
             />
           </div>
 
           <div>
-            <label htmlFor="agent-edit-vehicle-number" className="block text-xs font-semibold uppercase tracking-wider text-gray-700">
+            <label htmlFor="agent-edit-vehicle-number" className="block text-xs font-semibold uppercase tracking-wider text-ink-muted">
               Vehicle Registration Number
             </label>
             <input
@@ -175,15 +177,15 @@ export default function AdminEditAgentPage({ params }: { params: Promise<{ id: s
               value={vehicleNumber}
               onChange={(e) => setVehicleNumber(e.target.value)}
               placeholder="e.g. KA-01-AB-1234"
-              className="mt-1 w-full rounded-lg border border-gray-300 p-2.5 text-sm text-gray-900 outline-hidden focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+              className="input-surface mt-1 w-full text-sm font-mono"
             />
           </div>
         </div>
 
-        <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
+        <div className="flex items-center justify-end gap-3 pt-4 border-t border-hairline-soft">
           <Link
             href="/admin/agents"
-            className="rounded-lg border border-gray-300 px-4 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50 focus-visible:outline-2 focus-visible:outline-purple-600"
+            className="btn-secondary !px-4 !py-2 text-xs"
           >
             Cancel
           </Link>
@@ -191,9 +193,9 @@ export default function AdminEditAgentPage({ params }: { params: Promise<{ id: s
             type="submit"
             disabled={saving}
             aria-busy={saving}
-            className="inline-flex items-center gap-2 rounded-lg bg-purple-600 px-5 py-2 text-xs font-semibold text-white shadow-xs hover:bg-purple-700 disabled:opacity-50 transition focus-visible:outline-2 focus-visible:outline-purple-600"
+            className="btn-product-terraform !px-5 !py-2 text-xs"
           >
-            {saving ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <CheckCircle2 className="h-4 w-4" aria-hidden="true" />}
+            {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" aria-hidden="true" /> : <CheckCircle2 className="h-4 w-4 mr-2" aria-hidden="true" />}
             {saving ? "Saving Changes..." : "Save Profile"}
           </button>
         </div>

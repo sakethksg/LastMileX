@@ -34,12 +34,13 @@ export default function CustomerNotificationsPage() {
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
       <PageHeader
+        eyebrow="Event Stream"
         title="Notifications"
         subtitle="Live dispatch updates regarding your orders and delivery statuses"
       />
 
       {loading ? (
-        <LoadingSkeleton message="Loading notifications..." />
+        <LoadingSkeleton message="Loading event stream..." />
       ) : error ? (
         <ErrorState
           title="Could Not Load Notifications"
@@ -48,7 +49,7 @@ export default function CustomerNotificationsPage() {
         />
       ) : notifications.length === 0 ? (
         <EmptyState
-          icon={<Bell className="h-7 w-7 text-gray-400" aria-hidden="true" />}
+          icon={<Bell className="h-6 w-6 text-ink-muted" aria-hidden="true" />}
           title="All Caught Up"
           description="You have no notifications at this time."
         />
@@ -57,14 +58,14 @@ export default function CustomerNotificationsPage() {
           {notifications.map((notif) => (
             <div
               key={notif.id}
-              className="rounded-xl border border-gray-200 bg-white p-4 shadow-xs space-y-1.5 hover:border-blue-200 transition"
+              className="card-surface-1 !p-4 space-y-1.5 transition hover:border-product-waypoint/40"
             >
               <div className="flex items-center justify-between gap-3">
-                <span className="font-semibold text-sm text-gray-900">{notif.title}</span>
+                <span className="font-semibold text-sm text-ink">{notif.title}</span>
                 <NotificationStatusBadge status={notif.status} />
               </div>
-              <p className="text-xs text-gray-600 leading-relaxed">{notif.body}</p>
-              <div className="flex items-center justify-between text-[11px] text-gray-400 pt-1 border-t border-gray-50">
+              <p className="text-xs text-ink-muted leading-relaxed">{notif.body}</p>
+              <div className="flex items-center justify-between text-[11px] font-mono text-ink-subtle pt-2 border-t border-hairline-soft">
                 <span>Event: {notif.eventType?.replace(/_/g, " ")}</span>
                 <span>{new Date(notif.createdAt).toLocaleString()}</span>
               </div>

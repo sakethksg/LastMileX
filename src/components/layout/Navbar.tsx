@@ -5,7 +5,7 @@ import { useAuth } from "@/context/auth-context";
 import { useNav } from "@/context/nav-context";
 import { UserRole } from "@/types/enums";
 import Link from "next/link";
-import { Truck, LogOut, Bell, Menu, X } from "lucide-react";
+import { Truck, LogOut, Bell, Menu, X, Shield, User, Compass } from "lucide-react";
 
 export function Navbar() {
   const { user, signOut } = useAuth();
@@ -14,17 +14,17 @@ export function Navbar() {
   const getRoleBadgeStyle = (role: UserRole) => {
     switch (role) {
       case UserRole.ADMIN:
-        return "bg-purple-100 text-purple-800 border-purple-300";
+        return "bg-product-terraform/20 text-product-terraform-bright border-product-terraform/40";
       case UserRole.DELIVERY_AGENT:
-        return "bg-amber-100 text-amber-800 border-amber-300";
+        return "bg-product-vault/20 text-product-vault border-product-vault/40";
       case UserRole.CUSTOMER:
       default:
-        return "bg-blue-100 text-blue-800 border-blue-300";
+        return "bg-product-waypoint/20 text-product-waypoint border-product-waypoint/40";
     }
   };
 
   return (
-    <header className="sticky top-0 z-40 flex h-16 w-full items-center justify-between border-b border-gray-200 bg-white px-4 sm:px-6 lg:px-8 shadow-xs">
+    <header className="sticky top-0 z-40 flex h-16 w-full items-center justify-between border-b border-hairline-soft bg-canvas px-4 sm:px-6 lg:px-8">
       <div className="flex items-center gap-3">
         {user && (
           <button
@@ -32,7 +32,7 @@ export function Navbar() {
             onClick={toggleMobileNav}
             aria-label={isMobileNavOpen ? "Close navigation menu" : "Open navigation menu"}
             aria-expanded={isMobileNavOpen}
-            className="md:hidden inline-flex items-center justify-center rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-900 focus-visible:outline-2 focus-visible:outline-blue-600 transition"
+            className="md:hidden inline-flex items-center justify-center rounded-md p-2 text-ink-muted hover:bg-surface-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-accent-blue transition"
           >
             {isMobileNavOpen ? <X className="h-5 w-5" aria-hidden="true" /> : <Menu className="h-5 w-5" aria-hidden="true" />}
           </button>
@@ -40,34 +40,41 @@ export function Navbar() {
 
         <Link
           href="/"
-          className="flex items-center gap-2 font-bold text-gray-900 text-lg hover:opacity-90 focus-visible:outline-2 focus-visible:outline-blue-600 rounded"
+          className="flex items-center gap-2.5 font-bold text-ink text-lg hover:opacity-90 focus-visible:outline-2 focus-visible:outline-accent-blue rounded-md"
         >
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 text-white shadow-xs">
-            <Truck className="h-5 w-5" aria-hidden="true" />
+          <div className="flex h-9 w-9 items-center justify-center rounded-md bg-inverse-canvas text-inverse-ink font-bold text-sm tracking-tighter">
+            <span className="font-mono text-base">LX</span>
           </div>
-          <span className="tracking-tight">LastMileX</span>
+          <div className="flex flex-col">
+            <span className="tracking-tight text-ink font-bold text-base leading-none">LastMileX</span>
+            <span className="text-[10px] text-ink-subtle font-mono uppercase tracking-wider leading-none mt-1">
+              Dispatch Infra
+            </span>
+          </div>
         </Link>
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3">
         {user ? (
           <>
             {user.role === UserRole.CUSTOMER && (
               <Link
                 href="/notifications"
                 aria-label="View notifications"
-                className="relative p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition focus-visible:outline-2 focus-visible:outline-blue-600"
+                className="relative p-2 text-ink-muted hover:text-ink hover:bg-surface-2 rounded-md transition focus-visible:outline-2 focus-visible:outline-accent-blue"
                 title="Notifications"
               >
-                <Bell className="h-5 w-5" aria-hidden="true" />
+                <Bell className="h-4 w-4" aria-hidden="true" />
               </Link>
             )}
 
-            <div className="flex items-center gap-3 border-l border-gray-200 pl-4">
+            <div className="flex items-center gap-3 border-l border-hairline pl-4">
               <div className="text-right hidden sm:block">
-                <div className="text-sm font-semibold text-gray-900 truncate max-w-[160px]">{user.name || user.email}</div>
+                <div className="text-xs font-semibold text-ink truncate max-w-[160px]">
+                  {user.name || user.email}
+                </div>
                 <div className="flex justify-end mt-0.5">
-                  <span className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold border ${getRoleBadgeStyle(user.role)}`}>
+                  <span className={`inline-flex items-center px-1.5 py-0.5 rounded-xs text-[10px] font-semibold border ${getRoleBadgeStyle(user.role)}`}>
                     {user.role}
                   </span>
                 </div>
@@ -77,9 +84,9 @@ export function Navbar() {
                 type="button"
                 onClick={signOut}
                 aria-label="Sign out of account"
-                className="flex items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 shadow-xs hover:bg-gray-50 focus-visible:outline-2 focus-visible:outline-blue-600 transition"
+                className="btn-secondary !px-3 !py-1.5 text-xs"
               >
-                <LogOut className="h-4 w-4" aria-hidden="true" />
+                <LogOut className="h-3.5 w-3.5" aria-hidden="true" />
                 <span className="hidden sm:inline">Sign Out</span>
               </button>
             </div>
@@ -88,13 +95,13 @@ export function Navbar() {
           <div className="flex items-center gap-2">
             <Link
               href="/login"
-              className="rounded-lg px-3.5 py-1.5 text-sm font-semibold text-gray-700 hover:bg-gray-100 transition focus-visible:outline-2 focus-visible:outline-blue-600"
+              className="btn-secondary !py-2 !px-3.5 text-xs"
             >
               Sign In
             </Link>
             <Link
               href="/register"
-              className="rounded-lg bg-blue-600 px-3.5 py-1.5 text-sm font-semibold text-white shadow-xs hover:bg-blue-700 transition focus-visible:outline-2 focus-visible:outline-blue-600"
+              className="btn-primary !py-2 !px-3.5 text-xs"
             >
               Get Started
             </Link>

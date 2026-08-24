@@ -40,6 +40,7 @@ export default function AdminOrdersPage() {
   return (
     <div className="space-y-6">
       <PageHeader
+        eyebrow="Dispatch Operations"
         title="Orders & Dispatch Management"
         subtitle="Monitor all dispatches, assign drivers, and handle retries"
         actions={
@@ -52,7 +53,7 @@ export default function AdminOrdersPage() {
                 placeholder="Search order number..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-xs outline-hidden focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+                className="input-surface !py-2 text-xs"
               />
             </div>
 
@@ -62,7 +63,7 @@ export default function AdminOrdersPage() {
                 id="admin-status-filter"
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 shadow-xs outline-hidden focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+                className="input-surface !py-2 text-xs"
               >
                 <option value="">All Statuses</option>
                 <option value="CREATED">Created</option>
@@ -91,7 +92,7 @@ export default function AdminOrdersPage() {
         />
       ) : orders.length === 0 ? (
         <EmptyState
-          icon={<ClipboardList className="h-7 w-7 text-gray-400" aria-hidden="true" />}
+          icon={<ClipboardList className="h-6 w-6 text-ink-muted" aria-hidden="true" />}
           title="No Orders Found"
           description={
             statusFilter || search
@@ -100,10 +101,10 @@ export default function AdminOrdersPage() {
           }
         />
       ) : (
-        <div className="rounded-2xl border border-gray-200 bg-white overflow-hidden shadow-xs">
+        <div className="card-surface-1 overflow-hidden !p-0">
           <div className="overflow-x-auto">
             <table className="min-w-full text-left text-sm">
-              <thead className="border-b border-gray-200 bg-gray-50 text-xs font-semibold uppercase tracking-wider text-gray-500">
+              <thead className="border-b border-hairline bg-surface-2 text-caption font-semibold uppercase text-ink-muted">
                 <tr>
                   <th scope="col" className="py-3.5 px-4">Order Number</th>
                   <th scope="col" className="py-3.5 px-4">Status</th>
@@ -114,29 +115,29 @@ export default function AdminOrdersPage() {
                   <th scope="col" className="py-3.5 px-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-hairline-soft">
                 {orders.map((order) => (
-                  <tr key={order.id} className="hover:bg-gray-50/50 transition">
-                    <td className="py-3.5 px-4 font-mono font-bold text-gray-900">{order.orderNumber}</td>
+                  <tr key={order.id} className="hover:bg-surface-2/50 transition">
+                    <td className="py-3.5 px-4 font-mono font-bold text-ink">{order.orderNumber}</td>
                     <td className="py-3.5 px-4">
                       <OrderStatusBadge status={order.status} />
                     </td>
-                    <td className="py-3.5 px-4 text-xs text-gray-700 font-medium">
+                    <td className="py-3.5 px-4 text-xs text-ink-muted font-medium">
                       {order.customer?.name || order.customer?.email || "Customer"}
                     </td>
-                    <td className="py-3.5 px-4 text-xs text-gray-600 max-w-xs truncate">
+                    <td className="py-3.5 px-4 text-xs text-ink-muted max-w-xs truncate">
                       {order.dropAddress}
                     </td>
-                    <td className="py-3.5 px-4 text-xs font-semibold text-gray-700">
+                    <td className="py-3.5 px-4 text-xs font-mono text-ink-muted">
                       #{order.currentAttempt || 1}/{order.maxAttempts || 3}
                     </td>
-                    <td className="py-3.5 px-4 text-xs text-gray-500">
+                    <td className="py-3.5 px-4 text-xs text-ink-subtle font-mono">
                       {new Date(order.createdAt).toLocaleDateString()}
                     </td>
                     <td className="py-3.5 px-4 text-right">
                       <Link
                         href={`/admin/orders/${order.id}`}
-                        className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 focus-visible:outline-2 focus-visible:outline-purple-600 transition"
+                        className="btn-secondary !px-2.5 !py-1 text-xs"
                       >
                         Inspect & Assign
                       </Link>

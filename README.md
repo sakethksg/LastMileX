@@ -4,7 +4,7 @@
 
 LastMileX is a last-mile delivery and dispatch platform for managing orders from quote through delivery. It provides separate workflows for customers, delivery agents, and operations administrators, with server-side authorization and a deterministic pricing and assignment model.
 
-**Contents:** [What it does](#what-it-does) · [Architecture](#architecture) · [Schema visualizer](#supabase-schema-visualizer) · [Setup](#local-setup) · [Quality checks](#quality-checks) · [Security](#security-guarantees)
+**Contents:** [What it does](#what-it-does) · [Architecture](#architecture) · [Schema visualizer](#supabase-schema-visualizer) · [System design](#system-design) · [Setup](#local-setup) · [Quality checks](#quality-checks) · [Security](#security-guarantees)
 
 ## What It Does
 
@@ -31,11 +31,11 @@ The seed data includes one account for each application role:
 
 | Role | Email | Local demo password |
 | --- | --- | --- |
-| Administrator | `admin@lastmilex.com` | `LastMileX-Demo-2026!` |
-| Delivery agent | `agent@lastmilex.com` | `LastMileX-Demo-2026!` |
-| Customer | `customer@example.com` | `LastMileX-Demo-2026!` |
+| Administrator | `admin@lastmilex.com` | Value of `SEED_ADMIN_PASSWORD` |
+| Delivery agent | `agent@lastmilex.com` | Value of `SEED_AGENT_PASSWORD` |
+| Customer | `customer@example.com` | Value of `SEED_CUSTOMER_PASSWORD` |
 
-Before the first seed, set these values in `.env.local`:
+Before seeding, set these values in `.env.local`. They are the passwords used by the local demo accounts:
 
 ```dotenv
 SEED_ADMIN_PASSWORD="LastMileX-Demo-2026!"
@@ -117,6 +117,36 @@ erDiagram
 | Audit | `order_tracking_events`, `notifications` | Append-only tracking and notification delivery history |
 
 The canonical Prisma definition is in [`prisma/schema.prisma`](prisma/schema.prisma), with the database rationale and indexing strategy in [`docs/database-design.md`](docs/database-design.md).
+
+## System Design
+
+LastMileX is built around four cooperating domain workflows. Each workflow keeps its business rules in a server-side service, reads configuration through repositories, and records important decisions so operations can explain what happened later.
+
+### Rate Calculation Engine
+
+The rate engine is a deterministic service with no UI or HTTP dependencies. It receives pickup and drop addresses, package dimensions, actual weight, customer type, and payment type. It resolves both PIN codes to zones, classifies the route as intra-zone or inter-zone, and calculates volumetric weight using `length x breadth x height / 5000`. Chargeable weight is the greater of actual and volumetric weight, rounded up to the nearest 0.5 kg.
+
+The engine then selects the active rate card for the customer type, route, zone pair, and effective date. The matching weight slab supplies a base price and an incremental per-kilogram rate. COD orders additionally use the active surcharge rule, supporting flat fees or percentages with minimum and maximum caps. The result includes a full pricing breakdown. When an order is confirmed, that breakdown is persisted as an immutable `OrderPricingSnapshot`, so later rate-card changes affect only future orders.
+
+### Zone Detection
+
+The MVP uses a reliable database-driven mapping rather than requiring a geocoding provider. A pickup or drop PIN code is looked up in `service_areas`; each active service area belongs to one active `zone`. The two resolved zones determine the route type used by the pricing engine and assignment workflow.
+
+If either PIN code is not mapped to an active service area, the request fails with an unsupported-area error and order creation is blocked. This makes service coverage explicit and configurable for administrators. A future geocoding integration can extract or validate PIN codes from free-text addresses while preserving the same `ServiceArea -> Zone` model.
+
+### Auto-Assignment Logic
+
+Auto-assignment first filters delivery agents by active status, availability, and capacity. Agents whose current zone matches the pickup zone are preferred; if none are suitable, the search can expand to other available agents. Candidates are ranked with an explainable score based on zone match, inverse workload, proximity from last-known location when available, and activity recency. Deterministic tie-breaking ensures the same inputs produce the same winner.
+
+Assignment is protected against concurrent requests. The service uses an atomic conditional update that reserves capacity only while the agent remains available and below `maxConcurrentOrders`. If another request claims that capacity first, the candidate is skipped and the next-ranked candidate is tried. Successful assignments create assignment and delivery-attempt records, increment workload, update the order state, and emit tracking and notification events.
+
+### Failed Delivery Handling
+
+An agent can mark an order as failed only from the delivery-attempt state and must provide a failure reason. The operation records an immutable tracking event, marks the assignment and attempt as completed or failed, releases the agent's active capacity, and notifies the customer with the available next step.
+
+Customers may reschedule only for a future date and only while the current attempt is below the configured maximum, which defaults to three. Rescheduling increments the attempt number, creates a new `DeliveryAttempt`, updates the scheduled date, and returns the order to the assignment pool. Idempotency checks prevent duplicate reschedule requests, while the complete attempt and tracking history remains available for audit. Once the maximum is reached, the order stays `FAILED` for administrative resolution rather than entering an unbounded retry loop.
+
+See [`docs/system-design-outline.md`](docs/system-design-outline.md) for the expanded design notes and [`docs/order-lifecycle.md`](docs/order-lifecycle.md) for the complete state-transition rules.
 
 ## Tech Stack
 

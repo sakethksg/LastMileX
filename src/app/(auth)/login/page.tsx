@@ -6,7 +6,7 @@ import { useAuth } from "@/context/auth-context";
 import { UserRole } from "@/types/enums";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Truck, LogIn, Loader2 } from "lucide-react";
+import { Truck, LogIn, Loader2, ShieldCheck } from "lucide-react";
 import { fetchCurrentUser } from "@/lib/api/auth";
 import { ErrorState } from "@/components/ui/ErrorState";
 
@@ -58,14 +58,21 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-[calc(100vh-4rem)] w-full items-center justify-center p-4">
-      <div className="w-full max-w-md space-y-6 rounded-2xl border border-gray-200 bg-white p-6 sm:p-8 shadow-sm">
+    <div className="flex min-h-[calc(100vh-4rem)] w-full items-center justify-center p-4 bg-canvas">
+      <div className="w-full max-w-md space-y-6 rounded-lg border border-hairline bg-surface-1 p-6 sm:p-8">
         <div className="text-center space-y-2">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-blue-600 text-white shadow-xs">
-            <Truck className="h-6 w-6" aria-hidden="true" />
+          <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-md bg-surface-2 border border-hairline text-ink">
+            <span className="font-mono font-bold text-sm">LX</span>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Sign in to LastMileX</h1>
-          <p className="text-sm text-gray-500">Enter your credentials to access your dispatch dashboard</p>
+          <div className="text-eyebrow font-semibold uppercase tracking-eyebrow text-product-vault">
+            Security & Access
+          </div>
+          <h1 className="text-2xl font-bold text-ink tracking-tight font-sans">
+            Sign In to LastMileX
+          </h1>
+          <p className="text-xs text-ink-muted leading-relaxed">
+            Enter your credentials to access your dispatch node
+          </p>
         </div>
 
         {error && (
@@ -81,7 +88,7 @@ export default function LoginPage() {
           <div>
             <label
               htmlFor="login-email"
-              className="block text-xs font-semibold uppercase tracking-wider text-gray-700"
+              className="block text-xs font-semibold uppercase tracking-wider text-ink-muted"
             >
               Email Address
             </label>
@@ -92,15 +99,15 @@ export default function LoginPage() {
               autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
-              className="mt-1 block w-full rounded-lg border border-gray-300 px-3.5 py-2.5 text-sm text-gray-900 shadow-xs focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-hidden transition"
+              placeholder="operator@company.com"
+              className="input-surface mt-1 block w-full text-sm"
             />
           </div>
 
           <div>
             <label
               htmlFor="login-password"
-              className="block text-xs font-semibold uppercase tracking-wider text-gray-700"
+              className="block text-xs font-semibold uppercase tracking-wider text-ink-muted"
             >
               Password
             </label>
@@ -112,7 +119,7 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              className="mt-1 block w-full rounded-lg border border-gray-300 px-3.5 py-2.5 text-sm text-gray-900 shadow-xs focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-hidden transition"
+              className="input-surface mt-1 block w-full text-sm"
             />
           </div>
 
@@ -120,17 +127,17 @@ export default function LoginPage() {
             type="submit"
             disabled={loading}
             aria-busy={loading}
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-blue-700 disabled:opacity-50 transition focus-visible:outline-2 focus-visible:outline-blue-600"
+            className="btn-primary w-full py-2.5 mt-2"
           >
-            {loading ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <LogIn className="h-4 w-4" aria-hidden="true" />}
-            {loading ? "Signing in..." : "Sign In"}
+            {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" aria-hidden="true" /> : <LogIn className="h-4 w-4 mr-2" aria-hidden="true" />}
+            {loading ? "Verifying..." : "Sign In"}
           </button>
         </form>
 
-        <div className="text-center text-xs text-gray-500">
+        <div className="text-center text-xs text-ink-subtle border-t border-hairline-soft pt-4">
           Don&apos;t have an account?{" "}
-          <Link href="/register" className="font-semibold text-blue-600 hover:underline focus-visible:outline-2 focus-visible:outline-blue-600 rounded">
-            Register as Customer
+          <Link href="/register" className="font-semibold text-product-waypoint hover:underline focus-visible:outline-2 focus-visible:outline-accent-blue rounded-xs">
+            Create Customer Account
           </Link>
         </div>
       </div>

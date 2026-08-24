@@ -36,6 +36,7 @@ export default function CustomerOrdersPage() {
   return (
     <div className="space-y-6">
       <PageHeader
+        eyebrow="Shipment Management"
         title="My Shipments"
         subtitle="View, track, and manage all your delivery shipments"
         actions={
@@ -46,7 +47,7 @@ export default function CustomerOrdersPage() {
                 id="customer-status-filter"
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 shadow-xs outline-hidden focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="input-surface !py-2 text-xs"
               >
                 <option value="">All Statuses</option>
                 <option value="CONFIRMED">Confirmed</option>
@@ -63,9 +64,9 @@ export default function CustomerOrdersPage() {
 
             <Link
               href="/orders/new"
-              className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-xs hover:bg-blue-700 focus-visible:outline-2 focus-visible:outline-blue-600 transition"
+              className="btn-primary"
             >
-              <PackagePlus className="h-4 w-4" aria-hidden="true" />
+              <PackagePlus className="h-4 w-4 mr-2" aria-hidden="true" />
               New Order
             </Link>
           </div>
@@ -92,10 +93,10 @@ export default function CustomerOrdersPage() {
           actionHref={statusFilter ? undefined : "/orders/new"}
         />
       ) : (
-        <div className="rounded-2xl border border-gray-200 bg-white overflow-hidden shadow-xs">
+        <div className="card-surface-1 overflow-hidden !p-0">
           <div className="overflow-x-auto">
             <table className="min-w-full text-left text-sm">
-              <thead className="border-b border-gray-200 bg-gray-50 text-xs font-semibold uppercase tracking-wider text-gray-500">
+              <thead className="border-b border-hairline bg-surface-2 text-caption font-semibold uppercase text-ink-muted">
                 <tr>
                   <th scope="col" className="py-3 px-4">Tracking Number</th>
                   <th scope="col" className="py-3 px-4">Status</th>
@@ -105,26 +106,26 @@ export default function CustomerOrdersPage() {
                   <th scope="col" className="py-3 px-4 text-right">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-hairline-soft">
                 {orders.map((order) => (
-                  <tr key={order.id} className="hover:bg-gray-50/50 transition">
-                    <td className="py-3.5 px-4 font-mono font-bold text-gray-900">{order.orderNumber}</td>
+                  <tr key={order.id} className="hover:bg-surface-2/50 transition">
+                    <td className="py-3.5 px-4 font-mono font-bold text-ink">{order.orderNumber}</td>
                     <td className="py-3.5 px-4">
                       <OrderStatusBadge status={order.status} />
                     </td>
-                    <td className="py-3.5 px-4 text-xs text-gray-600 max-w-xs truncate">
+                    <td className="py-3.5 px-4 text-xs text-ink-muted max-w-xs truncate">
                       {order.dropAddress}
                     </td>
-                    <td className="py-3.5 px-4 text-xs font-medium text-gray-700">
+                    <td className="py-3.5 px-4 text-xs font-mono text-ink-muted">
                       {order.paymentType}
                     </td>
-                    <td className="py-3.5 px-4 text-xs text-gray-500">
+                    <td className="py-3.5 px-4 text-xs text-ink-subtle font-mono">
                       {new Date(order.createdAt).toLocaleDateString()}
                     </td>
                     <td className="py-3.5 px-4 text-right">
                       <Link
                         href={`/orders/${order.id}`}
-                        className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 focus-visible:outline-2 focus-visible:outline-blue-600 transition"
+                        className="btn-secondary !px-2.5 !py-1 text-xs"
                       >
                         View Details
                       </Link>
