@@ -72,11 +72,11 @@ describe("DashboardService", () => {
 
       const dashboard = await service.getCustomerDashboard("customer-1");
 
-      expect(dashboard.summary.totalOrders).toBe(9);
-      expect(dashboard.summary.deliveredOrders).toBe(5);
-      expect(dashboard.summary.failedOrders).toBe(1);
-      expect(dashboard.summary.cancelledOrders).toBe(1);
-      expect(dashboard.summary.activeOrders).toBe(3); // 9 - 5 (delivered) - 1 (cancelled) = 3
+      expect(dashboard.overview.totalOrders).toBe(9);
+      expect(dashboard.overview.deliveredOrders).toBe(5);
+      expect(dashboard.overview.failedOrders).toBe(1);
+      expect(dashboard.overview.cancelledOrders).toBe(1);
+      expect(dashboard.overview.activeOrders).toBe(3); // 9 - 5 (delivered) - 1 (cancelled) = 3
       expect(dashboard.recentOrders).toHaveLength(1);
       expect(dashboard.activeDeliveries).toHaveLength(1);
       expect(dashboard.activeDeliveries[0].assignedAgent?.name).toBe("Delivery Agent");

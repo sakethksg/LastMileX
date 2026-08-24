@@ -36,3 +36,5 @@ next-env.d.ts
 
 # superpowers
 .superpowers/
+.env*
+vercel-env.txt

@@ -67,7 +67,7 @@ export class DashboardService {
     });
 
     return {
-      summary: {
+      overview: {
         totalOrders,
         activeOrders,
         deliveredOrders,

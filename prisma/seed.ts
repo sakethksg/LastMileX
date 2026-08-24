@@ -116,6 +116,7 @@ async function main() {
     { pinCode: "560001", name: "MG Road", locality: "Central", city: "Bangalore", state: "Karnataka", zoneId: southZone.id },
     { pinCode: "560002", name: "City Market", locality: "South", city: "Bangalore", state: "Karnataka", zoneId: southZone.id },
     { pinCode: "560034", name: "Koramangala", locality: "South", city: "Bangalore", state: "Karnataka", zoneId: southZone.id },
+    { pinCode: "560038", name: "Indiranagar", locality: "East", city: "Bangalore", state: "Karnataka", zoneId: southZone.id },
   ];
 
   for (const sa of pinCodes) {
@@ -255,7 +256,36 @@ async function main() {
     },
   });
 
-  console.log(`✅ Seeded Rate Cards: ${intraB2cCard.name}, ${interB2cCard.name}`);
+  const southIntraB2cCard = await prisma.rateCard.upsert({
+    where: {
+      customerType_routeType_sourceZoneId_destinationZoneId_effectiveFrom: {
+        customerType: CustomerType.B2C,
+        routeType: RouteType.INTRA_ZONE,
+        sourceZoneId: southZone.id,
+        destinationZoneId: southZone.id,
+        effectiveFrom: effectiveDate,
+      },
+    },
+    update: {},
+    create: {
+      name: "Standard Intra-Zone B2C (South)",
+      customerType: CustomerType.B2C,
+      routeType: RouteType.INTRA_ZONE,
+      sourceZoneId: southZone.id,
+      destinationZoneId: southZone.id,
+      effectiveFrom: effectiveDate,
+      isActive: true,
+      weightSlabs: {
+        create: [
+          { minWeight: 0.0, maxWeight: 1.0, basePrice: 50.0, perKgRate: 0.0 },
+          { minWeight: 1.0, maxWeight: 5.0, basePrice: 50.0, perKgRate: 15.0 },
+          { minWeight: 5.0, maxWeight: 20.0, basePrice: 110.0, perKgRate: 12.0 },
+        ],
+      },
+    },
+  });
+
+  console.log(`✅ Seeded Rate Cards: ${intraB2cCard.name}, ${interB2cCard.name}, ${southIntraB2cCard.name}`);
 
   // 5. Seed COD Surcharges
   const codSurcharges = [
