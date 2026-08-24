@@ -21,6 +21,24 @@ LastMileX is a last-mile delivery and dispatch platform for managing orders from
 | Delivery agent | View assigned orders, update delivery progress, report failures, and manage availability/location |
 | Administrator | Manage zones and pricing, view all orders, manage agents, assign work, retry notifications, and perform audited operational actions |
 
+## Demo Credentials
+
+The seed data includes one account for each application role:
+
+| Role | Email | Local demo password |
+| --- | --- | --- |
+| Administrator | `admin@lastmilex.com` | `LastMileX-Demo-2026!` |
+| Delivery agent | `agent@lastmilex.com` | `LastMileX-Demo-2026!` |
+| Customer | `customer@example.com` | `LastMileX-Demo-2026!` |
+
+Before the first seed, set these values in `.env.local`:
+
+```dotenv
+SEED_ADMIN_PASSWORD="LastMileX-Demo-2026!"
+SEED_AGENT_PASSWORD="LastMileX-Demo-2026!"
+SEED_CUSTOMER_PASSWORD="LastMileX-Demo-2026!"
+```
+
 ## Architecture
 
 LastMileX is a modular monolith built with Next.js App Router. Route handlers handle HTTP concerns, services contain business rules, repositories contain Prisma access, and Zod schemas validate external input.
