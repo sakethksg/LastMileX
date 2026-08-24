@@ -1,6 +1,10 @@
 # LastMileX
 
+[![Next.js](https://img.shields.io/badge/Next.js-15-111827?logo=next.js&logoColor=white)](https://nextjs.org/) [![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ecf8e?logo=supabase&logoColor=white)](https://supabase.com/) [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/) [![Tests](https://img.shields.io/badge/tests-Vitest-6e9f18?logo=vitest&logoColor=white)](https://vitest.dev/)
+
 LastMileX is a last-mile delivery and dispatch platform for managing orders from quote through delivery. It provides separate workflows for customers, delivery agents, and operations administrators, with server-side authorization and a deterministic pricing and assignment model.
+
+**Contents:** [What it does](#what-it-does) · [Architecture](#architecture) · [Schema visualizer](#supabase-schema-visualizer) · [Setup](#local-setup) · [Quality checks](#quality-checks) · [Security](#security-guarantees)
 
 ## What It Does
 
@@ -64,6 +68,55 @@ Key domain services include:
 - `zone`, `user`, and `delivery-agent`: operational configuration and profile management
 
 See [docs/architecture.md](docs/architecture.md), [docs/api-design.md](docs/api-design.md), and [docs/order-lifecycle.md](docs/order-lifecycle.md) for the detailed design.
+
+## Supabase Schema Visualizer
+
+The application database is hosted in Supabase PostgreSQL and accessed through Prisma. This ER diagram mirrors the production-facing schema: geography drives zone resolution, rate cards drive pricing, and orders retain immutable pricing and tracking history.
+
+```mermaid
+erDiagram
+  User ||--o| CustomerProfile : profile
+  User ||--o| DeliveryAgentProfile : profile
+  User ||--o{ Order : customer
+  User ||--o{ Order : creator
+  User ||--o{ AgentAssignment : agent
+  User ||--o{ AgentAssignment : assigns
+  User ||--o{ DeliveryAttempt : agent
+  User ||--o{ DeliveryAttempt : reschedules
+  User ||--o{ OrderTrackingEvent : actor
+  User ||--o{ Notification : recipient
+
+  Zone ||--o{ ServiceArea : contains
+  Zone ||--o{ RateCard : source_zone
+  Zone ||--o{ RateCard : destination_zone
+  Zone ||--o{ Order : pickup_zone
+  Zone ||--o{ Order : drop_zone
+  Zone ||--o{ DeliveryAgentProfile : current_zone
+
+  RateCard ||--o{ WeightSlab : defines
+  RateCard ||--o{ OrderPricingSnapshot : captures
+  WeightSlab ||--o{ OrderPricingSnapshot : captures
+  CodSurcharge ||--o{ OrderPricingSnapshot : captures
+
+  Order ||--|| OrderPricingSnapshot : pricing_snapshot
+  Order ||--o{ AgentAssignment : assignments
+  Order ||--o{ DeliveryAttempt : delivery_attempts
+  Order ||--o{ OrderTrackingEvent : tracking_events
+  Order ||--o{ Notification : notifications
+```
+
+### Schema at a glance
+
+| Area | Tables | Responsibility |
+| --- | --- | --- |
+| Identity | `users`, `customer_profiles`, `delivery_agent_profiles` | Users, roles, agent capacity, and customer defaults |
+| Geography | `zones`, `service_areas` | PIN-code to delivery-zone resolution |
+| Pricing | `rate_cards`, `weight_slabs`, `cod_surcharges` | Versioned rates and COD rules |
+| Orders | `orders`, `order_pricing_snapshots` | Delivery requests and frozen pricing history |
+| Execution | `agent_assignments`, `delivery_attempts` | Assignment history and delivery attempts |
+| Audit | `order_tracking_events`, `notifications` | Append-only tracking and notification delivery history |
+
+The canonical Prisma definition is in [`prisma/schema.prisma`](prisma/schema.prisma), with the database rationale and indexing strategy in [`docs/database-design.md`](docs/database-design.md).
 
 ## Tech Stack
 
