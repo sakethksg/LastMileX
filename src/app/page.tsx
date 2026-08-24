@@ -2,12 +2,9 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { useAuth } from "@/context/auth-context";
-import { UserRole } from "@/types/enums";
 import { GradientWaves } from "@/components/ui/GradientWaves";
 import {
   ShieldCheck,
-  ArrowRight,
   Calculator,
   Workflow,
   Check,
@@ -20,7 +17,6 @@ import {
 } from "lucide-react";
 
 export default function HomePage() {
-  const { user } = useAuth();
   const [islandView, setIslandView] = useState<"tracking" | "quote" | "driver">("tracking");
 
   // Interactive Live Rate Estimator State
@@ -38,13 +34,6 @@ export default function HomePage() {
   const weightCharge = Math.ceil(extraWeight) * 40;
   const codFee = isCod ? 45 : 0;
   const totalEstimate = baseRate + weightCharge + codFee;
-
-  const getDashboardHref = () => {
-    if (!user) return "/login";
-    if (user.role === UserRole.ADMIN) return "/admin/dashboard";
-    if (user.role === UserRole.DELIVERY_AGENT) return "/agent/dashboard";
-    return "/dashboard";
-  };
 
   return (
     <div className="w-full bg-canvas text-ink">
@@ -100,14 +89,6 @@ export default function HomePage() {
             </p>
 
             <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
-              <Link
-                href={getDashboardHref()}
-                className="inline-flex items-center justify-center font-medium text-white bg-white/10 hover:bg-white/15 border border-white/10 rounded-xl px-6 py-2.5 text-sm transition active:scale-[0.98] backdrop-blur-md"
-              >
-                <span>{user ? "Open Console" : "Start Dispatching"}</span>
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-
               <Link
                 href="/orders/new"
                 className="inline-flex items-center justify-center font-medium text-white bg-white/10 hover:bg-white/15 border border-white/10 rounded-xl px-6 py-2.5 text-sm transition active:scale-[0.98] backdrop-blur-md"
