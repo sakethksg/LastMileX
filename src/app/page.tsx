@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/context/auth-context";
 import { UserRole } from "@/types/enums";
+import { GradientWaves } from "@/components/ui/GradientWaves";
 import {
   ShieldCheck,
   ArrowRight,
@@ -20,6 +21,7 @@ import {
 
 export default function HomePage() {
   const { user } = useAuth();
+  const [islandView, setIslandView] = useState<"tracking" | "quote" | "driver">("tracking");
 
   // Interactive Live Rate Estimator State
   const [calcLength, setCalcLength] = useState(25);
@@ -47,24 +49,48 @@ export default function HomePage() {
   return (
     <div className="w-full bg-canvas text-ink">
       {/* 1. HERO SECTION */}
-      <section className="relative overflow-hidden border-b border-hairline-soft pt-12 pb-16 md:pt-20 md:pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-center">
-          {/* Left Column: Copy */}
-          <div className="lg:col-span-7 space-y-6">
-            <div className="eyebrow-label flex items-center gap-2 text-sky-400">
-              <span className="h-1.5 w-1.5 rounded-full bg-sky-400"></span>
-              Enterprise Last-Mile Logistics Infrastructure
-            </div>
+      <section className="relative isolate flex min-h-[calc(100vh-5rem)] items-center overflow-hidden py-8 md:py-14 w-full">
+        {/* Background Gradient Waves */}
+        <div className="absolute inset-0 z-0 w-full h-full overflow-hidden">
+          <GradientWaves
+            horizonColor="#5227FF"
+            waveColor="#FF9FFC"
+            crestColor="#FFFFFF"
+            speed={0.4}
+            amplitude={2.5}
+            waveScale={0.6}
+            waveRatio={0.9}
+            swell={35}
+            turbulence={20}
+            tilt={1.11}
+            zoom={1}
+            height={5.5}
+            fogDepth={15}
+            detail="medium"
+            brightness={1}
+            opacity={1}
+            mouseInteraction
+            parallaxStrength={0.5}
+            grain
+            grainIntensity={0.05}
+            className="w-full h-full"
+          />
+          {/* Subtle bottom blend into the next section */}
+          <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-canvas to-transparent pointer-events-none" />
+        </div>
 
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex justify-center">
+          {/* Centered Hero Copy */}
+          <div className="max-w-3xl flex flex-col items-center text-center space-y-6">
             <h1 className="max-w-4xl text-4xl sm:text-5xl lg:text-display-lg font-bold text-ink tracking-tight leading-[1.1]">
-              Every shipment. Accounted for.
+              Every shipment.   Accounted for.
             </h1>
 
             <p className="text-body-lg text-ink-muted leading-relaxed max-w-xl">
               Quote accurately, assign drivers automatically, and maintain an immutable record of every delivery from pickup to proof of delivery.
             </p>
 
-            <div className="flex flex-wrap items-center gap-3 pt-2">
+            <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
               <Link
                 href={getDashboardHref()}
                 className="btn-primary"
@@ -81,101 +107,12 @@ export default function HomePage() {
                 <span>Calculate Quote</span>
               </Link>
             </div>
-
-            {/* Logistics Feature Capabilities */}
-            <div className="pt-8 border-t border-hairline-soft flex flex-wrap items-center gap-x-6 gap-y-3 text-caption text-ink-muted">
-              <div className="flex items-center gap-2">
-                <Check className="h-4 w-4 text-emerald-400" />
-                <span>Volumetric Weight Rating</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Check className="h-4 w-4 text-emerald-400" />
-                <span>Automated Driver Dispatch</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Check className="h-4 w-4 text-emerald-400" />
-                <span>Immutable Audit Logs</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Right Column: Live Tracking & Telemetry Terminal Preview */}
-          <div className="lg:col-span-5 relative">
-            <div className="relative rounded-lg bg-surface-1 border border-hairline p-5 sm:p-6 space-y-4 overflow-hidden">
-              {/* Header bar of dispatch preview */}
-              <div className="flex items-center justify-between border-b border-hairline-soft pb-3">
-                <div className="flex items-center gap-2">
-                  <span className="font-mono text-xs font-semibold text-ink">ORDER #LX-9482</span>
-                  <span className="text-caption text-ink-subtle">· Intra-Zone</span>
-                </div>
-                <span className="font-mono text-[11px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-xs border border-emerald-500/20 font-medium">
-                  IN TRANSIT
-                </span>
-              </div>
-
-              {/* Live Dispatch Steps */}
-              <div className="space-y-3 font-sans text-xs">
-                <div className="rounded-md bg-surface-2 p-3.5 border border-hairline-soft space-y-2">
-                  <div className="flex items-center justify-between text-ink-muted">
-                    <span className="text-[11px] font-semibold uppercase tracking-wider text-ink flex items-center gap-1.5">
-                      <Workflow className="h-3.5 w-3.5 text-sky-400" />
-                      Lifecycle Pipeline
-                    </span>
-                    <span className="font-mono text-[10px] text-ink-subtle">LATENCY: &lt; 2ms</span>
-                  </div>
-                  <div className="flex items-center justify-between text-[11px] pt-1 font-mono">
-                    <span className="text-ink-subtle">CONFIRMED</span>
-                    <span className="text-sky-400">&rarr;</span>
-                    <span className="text-ink-subtle">ASSIGNED</span>
-                    <span className="text-sky-400">&rarr;</span>
-                    <span className="text-sky-400 font-bold">IN_TRANSIT</span>
-                    <span className="text-ink-subtle">&rarr;</span>
-                    <span className="text-ink-subtle">DELIVERED</span>
-                  </div>
-                </div>
-
-                {/* Rate Breakdown */}
-                <div className="rounded-md bg-surface-2 p-3.5 border border-hairline-soft space-y-2">
-                  <div className="flex items-center justify-between text-ink-muted">
-                    <span className="text-[11px] font-semibold uppercase tracking-wider text-ink flex items-center gap-1.5">
-                      <Calculator className="h-3.5 w-3.5 text-indigo-400" />
-                      Rate Snapshot
-                    </span>
-                    <span className="font-mono text-ink-muted font-bold text-xs">₹160.00</span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2 text-[11px] font-mono pt-1">
-                    <div>
-                      <span className="text-ink-subtle">VOLUMETRIC: </span>
-                      <span className="text-ink font-semibold">{volumetricWeight} kg</span>
-                    </div>
-                    <div>
-                      <span className="text-ink-subtle">CHARGEABLE: </span>
-                      <span className="text-ink font-semibold">{chargeableWeight} kg</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Driver & Route Status */}
-                <div className="rounded-md bg-surface-2 p-3.5 border border-hairline-soft flex items-center justify-between">
-                  <div className="flex items-center gap-2.5">
-                    <Truck className="h-4 w-4 text-emerald-400" />
-                    <div>
-                      <div className="text-[12px] font-semibold text-ink">Driver #AG-102 (Rajesh K.)</div>
-                      <div className="text-[10px] sm:text-[11px] text-ink-muted">Zone A · 2 active deliveries</div>
-                    </div>
-                  </div>
-                  <span className="text-[10px] font-mono bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-xs border border-emerald-500/20">
-                    ASSIGNED
-                  </span>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </section>
 
       {/* 2. PRODUCT CAPABILITIES SECTION */}
-      <section className="py-20 border-t border-hairline-soft bg-canvas">
+      <section id="capabilities" className="py-20 bg-canvas">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
           <div className="space-y-3">
             <div className="eyebrow-label">
