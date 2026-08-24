@@ -5,21 +5,10 @@ import Link from "next/link";
 import { useAuth } from "@/context/auth-context";
 import { UserRole } from "@/types/enums";
 import {
-  Truck,
-  Package,
   ShieldCheck,
-  Zap,
   ArrowRight,
   Calculator,
-  RotateCcw,
-  CheckCircle2,
-  Lock,
-  Cpu,
-  Layers,
-  Terminal,
-  Server,
   Workflow,
-  Sparkles,
   Check,
   ChevronRight,
 } from "lucide-react";
@@ -53,21 +42,21 @@ export default function HomePage() {
   return (
     <div className="w-full bg-canvas text-ink">
       {/* 1. HERO SECTION */}
-      <section className="relative overflow-hidden pt-12 pb-24 md:pt-20 md:pb-32 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="grid lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+      <section className="relative overflow-hidden border-b border-hairline-soft pt-10 pb-16 md:pt-16 md:pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div className="grid lg:grid-cols-12 gap-10 lg:gap-16 items-center">
           {/* Left Column: Copy */}
           <div className="lg:col-span-7 space-y-6">
-            <div className="eyebrow-label flex items-center gap-2">
+            <div className="eyebrow-label flex items-center gap-2 text-product-waypoint">
               <span className="h-1.5 w-1.5 rounded-full bg-product-waypoint animate-pulse"></span>
-              Enterprise Dispatch Infrastructure
+              Dispatch infrastructure for teams that deliver
             </div>
 
-            <h1 className="text-4xl sm:text-6xl lg:text-[72px] xl:text-display-xl font-bold text-ink tracking-tightest leading-[1.17]">
-              Deterministic Logistics for Modern Supply Chains.
+            <h1 className="max-w-4xl text-4xl sm:text-6xl lg:text-[68px] xl:text-display-xl font-bold text-ink tracking-tightest leading-[1.08]">
+              Every shipment. Accounted for.
             </h1>
 
-            <p className="text-body-lg text-ink-muted leading-[1.69] max-w-2xl">
-              An enterprise delivery runtime featuring mathematical volumetric rate cards, cryptographic state custody, multi-factor autonomous fleet orchestration, and strict finite state machine guarantees.
+            <p className="text-body-lg text-ink-muted leading-[1.55] max-w-xl">
+              Quote accurately, assign intelligently, and keep an immutable record of every delivery from pickup to proof of delivery.
             </p>
 
             <div className="flex flex-wrap items-center gap-3 pt-2">
@@ -75,7 +64,7 @@ export default function HomePage() {
                 href={getDashboardHref()}
                 className="btn-primary"
               >
-                <span>{user ? "Open Your Console" : "Launch Dispatch Engine"}</span>
+                <span>{user ? "Open your console" : "Start dispatching"}</span>
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
 
@@ -84,13 +73,13 @@ export default function HomePage() {
                 className="btn-secondary"
               >
                 <Calculator className="mr-2 h-4 w-4 text-product-waypoint" />
-                <span>Calculate Live Quote</span>
+                <span>Calculate a quote</span>
               </Link>
             </div>
 
             {/* Architecture Identity Pills */}
-            <div className="pt-8 border-t border-hairline-soft flex flex-wrap items-center gap-4 text-caption text-ink-subtle">
-              <span className="font-mono text-ink-muted">Stack:</span>
+            <div className="pt-7 border-t border-hairline-soft flex flex-wrap items-center gap-x-4 gap-y-2 text-caption text-ink-subtle">
+              <span className="font-mono text-ink-muted">Built for control:</span>
               <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-pill bg-surface-1 border border-hairline text-ink-muted">
                 <span className="h-2 w-2 rounded-full bg-product-terraform"></span>
                 <span>Terraform Quoting</span>
@@ -112,7 +101,7 @@ export default function HomePage() {
 
           {/* Right Column: 3D Isometric Visual Canvas */}
           <div className="lg:col-span-5 relative">
-            <div className="relative rounded-lg bg-surface-1 border border-hairline p-6 shadow-2xl space-y-4 overflow-hidden">
+            <div className="relative rounded-lg bg-surface-1 border border-hairline p-5 sm:p-6 shadow-2xl space-y-4 overflow-hidden">
               {/* Header bar of mock telemetry terminal */}
               <div className="flex items-center justify-between border-b border-hairline pb-3">
                 <div className="flex items-center gap-2">
@@ -120,7 +109,7 @@ export default function HomePage() {
                   <div className="h-2.5 w-2.5 rounded-full bg-product-vault/80"></div>
                   <div className="h-2.5 w-2.5 rounded-full bg-product-nomad/80"></div>
                   <span className="ml-2 font-mono text-[11px] text-ink-subtle">
-                    lastmilex-node-cluster.us-east
+                    dispatch-console / live-order
                   </span>
                 </div>
                 <span className="font-mono text-[10px] text-product-nomad bg-product-nomad/10 px-2 py-0.5 rounded-xs border border-product-nomad/20">
