@@ -1,173 +1,212 @@
 # LastMileX
 
-> **Production-Grade Last-Mile Delivery Logistics & Dispatch Management Platform**
+LastMileX is a last-mile delivery and dispatch platform for managing orders from quote through delivery. It provides separate workflows for customers, delivery agents, and operations administrators, with server-side authorization and a deterministic pricing and assignment model.
 
-LastMileX is an enterprise-grade last-mile logistics platform built with Next.js 15 (App Router), TypeScript (Strict Mode), Tailwind CSS, Prisma ORM, and Supabase PostgreSQL. It features deterministic rate calculation, transactional order creation with immutable pricing snapshots, intelligent delivery agent assignment, strict state-machine delivery execution, automated failure handling with monotonic retry rescheduling, idempotent event-driven notifications, and role-based frontend portals for Customers, Delivery Agents, and Operations Administrators.
+## What It Does
 
----
+- Calculates delivery quotes from pickup and drop PIN codes, package dimensions, weight, order type, route type, and payment type.
+- Preserves an immutable pricing snapshot when an order is created.
+- Manages zones, service areas, rate cards, weight slabs, and COD surcharges.
+- Supports customer order booking, tracking, notifications, and delivery rescheduling.
+- Assigns orders manually or through a deterministic agent assignment service.
+- Enforces the delivery lifecycle with role-aware state transitions and append-only tracking events.
+- Provides operational dashboards for customers, delivery agents, and administrators.
+- Records notification history and supports retry handling for failed notifications.
 
-## 🚀 Key Features & Domains
+## Roles
 
-### 1. Zone & Serviceability Management (Phase 2)
-- Multi-tier zone hierarchy (`Zone`, `ServiceArea`, `Hub`).
-- PIN-code-to-zone routing resolution and serviceable area boundaries.
-- Admin-managed weight slabs and configurable Cash-on-Delivery (COD) surcharge rules.
+| Role | Main capabilities |
+| --- | --- |
+| Customer | Register, request quotes, create orders, track deliveries, view notifications, and reschedule failed deliveries |
+| Delivery agent | View assigned orders, update delivery progress, report failures, and manage availability/location |
+| Administrator | Manage zones and pricing, view all orders, manage agents, assign work, retry notifications, and perform audited operational actions |
 
-### 2. Deterministic Rate Calculation Engine (Phase 3)
-- Real-time volumetric and weight pricing engine (`POST /api/quotes`).
-- Volumetric weight vs actual weight comparison ($\text{chargeableWeight} = \max(\text{actualWeight}, \frac{L \times B \times H}{5000})$).
-- Slab-based pricing resolution with custom rate cards and COD surcharge fee calculation.
+## Architecture
 
-### 3. Transactional Order Management & Pricing Snapshots (Phase 4)
-- Transactional order creation with formatted unique tracking identifiers (`LMX-YYYYMMDD-XXXXXX`).
-- Immutable `OrderPricingSnapshot` ensuring historical financial charges remain isolated from future rate card modifications.
-- Complete audit-trailed `OrderTrackingEvent` transition logging.
-
-### 4. Agent Workload & Deterministic Assignment Engine (Phase 5)
-- Delivery agent profiles, shift management, and dynamic capacity tracking ($0 \le \text{activeDeliveryCount} \le \text{maxConcurrentOrders}$).
-- Multi-factor deterministic auto-assignment algorithm (40% Zone Affinity, 30% Workload Capacity, 20% Proximity, 10% Recency).
-- Admin manual assignment and safe reassignment workflows.
-
-### 5. Delivery Execution, Failure Handling & Rescheduling (Phase 6)
-- Finite state-machine delivery execution: `ASSIGNED` $\rightarrow$ `PICKED_UP` $\rightarrow$ `IN_TRANSIT` $\rightarrow$ `OUT_FOR_DELIVERY` $\rightarrow$ `DELIVERED` / `FAILED`.
-- Structured failure reason recording (`CUSTOMER_UNAVAILABLE`, `ADDRESS_NOT_FOUND`, `CUSTOMER_REFUSED`, `ACCESS_RESTRICTED`, `PACKAGE_DAMAGED`, `OTHER`).
-- Customer and Admin delivery rescheduling with strictly monotonic retry attempt tracking ($\text{attemptNumber} = n + 1$).
-- Safe capacity reclamation upon delivery completion or failure.
-
-### 6. Event-Driven Notifications & Retry Engine (Phase 7)
-- Decoupled notification dispatch across lifecycle events (`ORDER_CONFIRMED`, `ASSIGNED`, `OUT_FOR_DELIVERY`, `DELIVERED`, `FAILED`, `RESCHEDULED`, etc.).
-- Built-in idempotency prevention eliminating duplicate notifications for identical events.
-- Admin notification retry endpoint with exponential backoff support.
-
-### 7. Multi-Persona Operational Dashboards & Role-Based UI (Phases 8, 12, 13)
-- **Customer Portal** (`/dashboard`, `/orders`, `/orders/[id]`, `/orders/new`, `/notifications`): Live tracking, interactive rate estimator, 2-step shipment booking, attempt history, customer rescheduling.
-- **Delivery Agent Portal** (`/agent/dashboard`, `/agent/orders`, `/agent/orders/[id]`): Active workload vs capacity telemetry, assigned dispatches, state-driven action bar (Pickup $\rightarrow$ In Transit $\rightarrow$ Out for Delivery $\rightarrow$ Complete / Report Failure).
-- **Admin Operations Console** (`/admin/dashboard`, `/admin/orders`, `/admin/orders/[id]`, `/admin/agents`, `/admin/agents/[id]`, `/admin/notifications`): Fleet capacity monitoring, manual driver assignment, one-click auto-assignment, agent profile edits, notification retry log.
-
----
-
-## 🔒 Security & Authorization Invariants
-
-- **Server-Authoritative RBAC**: Client-side `RoleGuard` provides user guidance; all server API routes enforce strict RBAC boundaries (`requireAuth()`, `authorizeRoles()`).
-- **IDOR Protection**: Multi-tenant customer isolation guarantees customers access only their own orders. Delivery agents can interact only with orders assigned to them.
-- **State Machine Isolation**: Orders transition strictly along valid directed acyclic paths. Invalid transitions and jumps from terminal states are rejected with `409 CONFLICT`.
-- **Secret Isolation**: Service role keys and database URLs are strictly restricted to server execution environments and excluded from client bundles.
-
----
-
-## 📁 Repository Structure
+LastMileX is a modular monolith built with Next.js App Router. Route handlers handle HTTP concerns, services contain business rules, repositories contain Prisma access, and Zod schemas validate external input.
 
 ```text
-LastMileX/
-├── .github/
-│   └── workflows/ci.yml       # GitHub Actions CI verification pipeline
-├── docs/                      # Architectural & domain design specifications
-│   ├── production-setup.md    # Production setup and deployment runbook
-│   └── release-readiness.md   # Release checklist & invariants
-├── prisma/
-│   └── schema.prisma          # PostgreSQL relational schema
-├── src/
-│   ├── app/                   # Next.js App Router (Pages & API routes)
-│   │   ├── (admin)/           # Admin console pages
-│   │   ├── (agent)/           # Delivery agent portal pages
-│   │   ├── (auth)/            # Login & registration pages
-│   │   ├── (customer)/        # Customer portal pages
-│   │   └── api/               # Server API route handlers
-│   ├── components/            # UI components (PageHeader, Modal, StatusBadge, etc.)
-│   ├── context/               # AuthContext & NavContext
-│   ├── lib/api/               # Typed frontend API client layer
-│   ├── repositories/          # Prisma database repositories
-│   ├── schemas/               # Zod validation schemas
-│   ├── services/              # Domain business logic layer
-│   └── types/                 # Enums and domain interface definitions
-└── tests/
-    ├── integration/           # Cross-domain end-to-end lifecycle integration tests
-    └── unit/                  # Unit, API, RBAC, Security, Concurrency, and UI test suites
+Browser
+  -> Next.js pages and route handlers
+  -> authentication and RBAC
+  -> domain services
+  -> repositories and Prisma
+  -> Supabase PostgreSQL
+
+Supabase Auth provides identity and sessions.
+Resend and Twilio are optional notification providers.
 ```
 
----
+Key domain services include:
 
-## 🚦 Getting Started
+- `rate-engine`: zone resolution, chargeable weight, rate-card lookup, and COD pricing
+- `order`: order creation, pricing snapshots, lifecycle transitions, and tracking
+- `assignment`: agent filtering, scoring, capacity checks, and reassignment
+- `notification`: event notifications, provider integration, idempotency, and retries
+- `zone`, `user`, and `delivery-agent`: operational configuration and profile management
 
-### 1. Installation
+See [docs/architecture.md](docs/architecture.md), [docs/api-design.md](docs/api-design.md), and [docs/order-lifecycle.md](docs/order-lifecycle.md) for the detailed design.
+
+## Tech Stack
+
+- Next.js 15 with App Router and React 19
+- TypeScript with strict checking
+- Tailwind CSS
+- Supabase Auth and PostgreSQL
+- Prisma ORM
+- Zod validation
+- Vitest unit and integration tests
+- Vercel-compatible deployment model
+
+## Prerequisites
+
+- Node.js 20 or newer
+- npm
+- A Supabase project with Email/Password authentication enabled
+- PostgreSQL connection URLs from Supabase
+
+## Local Setup
+
+Clone the repository and install dependencies:
+
 ```bash
 git clone https://github.com/sakethksg/LastMileX.git
 cd LastMileX
 npm install
 ```
 
-### 2. Environment Configuration
-Copy `.env.example` to `.env`:
+Create a local environment file:
+
 ```bash
-cp .env.example .env
+cp .env.example .env.local
 ```
 
-### 3. Database Setup & Prisma Generation
+Set these required variables in `.env.local`:
+
+| Variable | Purpose |
+| --- | --- |
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Browser-safe Supabase key |
+| `NEXT_PUBLIC_APP_URL` | Application URL, normally `http://localhost:3000` locally |
+| `SUPABASE_SERVICE_ROLE_KEY` | Server-only Supabase administrative key |
+| `DATABASE_URL` | Pooled PostgreSQL URL for application runtime |
+| `DIRECT_URL` | Direct PostgreSQL URL for Prisma migrations |
+
+Never expose `SUPABASE_SERVICE_ROLE_KEY`, `DATABASE_URL`, or `DIRECT_URL` with a `NEXT_PUBLIC_` prefix or commit real secrets. Optional `RESEND_*` and `TWILIO_*` variables enable external notification providers; without them, the application uses its in-memory notification provider.
+
+Validate the schema, generate Prisma Client, and apply local migrations:
+
 ```bash
 npx prisma validate
 npx prisma generate
 npx prisma migrate dev
-npx prisma migrate status
+```
+
+Seed and verify development data:
+
+```bash
 npm run db:seed
 npm run db:verify-seed
 ```
 
-The seed command creates or reuses the three Supabase Auth persona users, then
-creates geography, pricing, and deterministic lifecycle fixtures. It is
-idempotent: existing fixture order numbers are skipped on later runs. Seed
-passwords are needed only when a new Auth user must be created; provide them
-through local, ignored environment variables such as `SEED_ADMIN_PASSWORD`.
-Never commit seed passwords, service-role keys, or database URLs.
-
-To optionally verify password login for each persona, set the three
-`SEED_*_PASSWORD` variables locally and run:
+The seed is idempotent and creates Auth-linked persona users plus geography, pricing, and lifecycle fixtures. Set the `SEED_*_PASSWORD` variables locally only when new Auth users need to be created. To test password login for seeded personas, run:
 
 ```bash
 npm run auth:verify
 ```
 
-Without those variables, the Auth check skips login attempts by design.
+## Run The App
 
-### 4. Running the Application
 ```bash
-# Development server
 npm run dev
+```
 
-# Production build & start
+Open `http://localhost:3000` in a browser. For a production-like run:
+
+```bash
 npm run build
 npm run start
 ```
 
----
+## Quality Checks
 
-## 🧪 Testing & Quality Gates
+The CI pipeline runs the same core checks:
 
-Run the automated test suite and verification commands:
 ```bash
-# Run 250+ automated unit and integration tests
-npm run test
-
-# TypeScript typecheck
 npm run typecheck
-
-# ESLint validation
 npm run lint
-
-# Production build compilation
+npm run test
 npm run build
 ```
 
----
+Prisma checks useful before database changes:
 
-## ⚠️ Known Scope Boundaries & Design Limitations
+```bash
+npx prisma validate
+npx prisma migrate status
+```
 
-LastMileX is designed around explicit, verified architectural scopes:
-- **No WebSockets / Live GPS streaming**: Tracking progress is event-driven via HTTP state transitions and polling telemetry.
-- **In-Memory Notification Provider**: Default notifications are delivered through an in-memory mock provider unless external providers (Resend / Twilio) are explicitly configured in production.
-- **No External Payment Gateway**: Payments are modeled via `PREPAID` and `COD` transaction records.
+## Order Lifecycle
 
----
+Orders follow a controlled lifecycle:
 
-## 📜 License
+```text
+CREATED -> CONFIRMED -> ASSIGNED -> PICKED_UP -> IN_TRANSIT
+         -> OUT_FOR_DELIVERY -> DELIVERED
+                              -> FAILED -> RESCHEDULED
+```
+
+Every status change creates an append-only tracking event. Failed deliveries retain their attempt history, and rescheduling is limited by the configured maximum attempt count. Existing orders keep their original pricing even when rate cards change.
+
+## Security Guarantees
+
+- Authentication and authorization are enforced on the server.
+- Customers can access only their own orders.
+- Delivery agents can act only on orders assigned to them.
+- External request payloads are validated with Zod.
+- Privileged database credentials stay server-side.
+- Invalid lifecycle transitions are rejected.
+- Pricing is calculated server-side; client-submitted totals are not trusted.
+- Tracking history is append-only.
+
+## Repository Layout
+
+```text
+src/
+  app/            Pages, layouts, and API route handlers
+  components/     Shared UI components
+  config/         Environment and application configuration
+  context/        Auth and navigation context
+  lib/            Prisma, Supabase, API, and domain utilities
+  repositories/   Database access through Prisma
+  schemas/        Zod request schemas
+  services/       Domain business logic
+  types/          Shared domain and API types
+prisma/           Schema, migrations, seed, and database policies
+tests/            Unit and integration tests
+docs/             Architecture, API, operations, and design documents
+```
+
+## Deployment
+
+The intended deployment model is Next.js on Vercel with Supabase PostgreSQL and Supabase Auth. In production, use the pooled `DATABASE_URL` for runtime queries and `DIRECT_URL` for migrations:
+
+```bash
+npx prisma migrate deploy
+npm run build
+npm run start
+```
+
+Read [docs/production-setup.md](docs/production-setup.md) for the production environment, connection pooling, seed, and pre-deployment checklist.
+
+## Current MVP Boundaries
+
+- Tracking uses HTTP state transitions and polling rather than live GPS streaming.
+- Agent proximity uses the last reported location; there is no live GPS feed.
+- Payment records model `PREPAID` and `COD`; no payment gateway is included.
+- Email and SMS integrations are optional; local development defaults to an in-memory provider.
+- PIN-code service-area mapping is used instead of geospatial routing.
+
+## License
 
 This project is licensed under the MIT License.
