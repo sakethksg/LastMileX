@@ -14,12 +14,12 @@ export function Navbar() {
   const getRoleBadgeStyle = (role: UserRole) => {
     switch (role) {
       case UserRole.ADMIN:
-        return "bg-product-terraform/20 text-product-terraform-bright border-product-terraform/40";
+        return "bg-indigo-500/10 text-indigo-400 border-indigo-500/20";
       case UserRole.DELIVERY_AGENT:
-        return "bg-product-vault/20 text-product-vault border-product-vault/40";
+        return "bg-amber-500/10 text-amber-400 border-amber-500/20";
       case UserRole.CUSTOMER:
       default:
-        return "bg-product-waypoint/20 text-product-waypoint border-product-waypoint/40";
+        return "bg-surface-2 text-ink-muted border-hairline-soft";
     }
   };
 

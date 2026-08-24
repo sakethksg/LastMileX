@@ -109,7 +109,7 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
             <button
               type="button"
               onClick={() => setIsRescheduling(true)}
-              className="btn-secondary !border-amber-200/50 !text-amber-200"
+              className="btn-secondary !border-amber-500/50 !text-amber-400"
             >
               <RotateCcw className="h-4 w-4 mr-2" aria-hidden="true" />
               Reschedule Delivery (Attempt {order.currentAttempt}/{order.maxAttempts || 3})
@@ -178,7 +178,7 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
         <div className="md:col-span-2 space-y-6">
           <section aria-label="Routing and dispatch" className="card-surface-1 space-y-4">
             <h2 className="text-base font-bold text-ink flex items-center gap-2">
-              <MapPin className="h-5 w-5 text-product-waypoint" aria-hidden="true" />
+              <MapPin className="h-5 w-5 text-sky-400" aria-hidden="true" />
               Routing Details
             </h2>
 
@@ -198,7 +198,7 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
 
             {assignedAgent && (
               <div className="mt-4 flex items-center gap-3 border-t border-hairline-soft pt-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-md bg-surface-2 border border-hairline text-product-vault">
+                <div className="flex h-10 w-10 items-center justify-center rounded-md bg-surface-2 border border-hairline text-amber-400">
                   <User className="h-5 w-5" aria-hidden="true" />
                 </div>
                 <div>
@@ -213,7 +213,7 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
           {/* Tracking History Timeline */}
           <section aria-label="Tracking history" className="card-surface-1 space-y-4">
             <h2 className="text-base font-bold text-ink flex items-center gap-2">
-              <Clock className="h-5 w-5 text-product-waypoint" aria-hidden="true" />
+              <Clock className="h-5 w-5 text-sky-400" aria-hidden="true" />
               Tracking Timeline
             </h2>
 
@@ -223,7 +223,7 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
               <div className="relative pl-6 space-y-6 before:absolute before:left-2.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-hairline">
                 {trackingEvents.map((event: any) => (
                   <div key={event.id} className="relative">
-                    <div className="absolute -left-6 top-1.5 h-3.5 w-3.5 rounded-full border-2 border-surface-1 bg-product-waypoint shadow-xs" aria-hidden="true" />
+                    <div className="absolute -left-6 top-1.5 h-3.5 w-3.5 rounded-full border-2 border-surface-1 bg-sky-400 shadow-xs" aria-hidden="true" />
                     <div className="text-xs font-mono font-bold text-ink">
                       {event.newStatus.replace(/_/g, " ")}
                     </div>
@@ -242,7 +242,7 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
         <div className="space-y-6">
           <section aria-label="Pricing breakdown" className="card-surface-1 space-y-4">
             <h2 className="text-base font-bold text-ink flex items-center gap-2">
-              <Package className="h-5 w-5 text-product-terraform-bright" aria-hidden="true" />
+              <Package className="h-5 w-5 text-indigo-400" aria-hidden="true" />
               Pricing Snapshot
             </h2>
 
@@ -258,7 +258,7 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
                 </div>
                 <div className="flex justify-between text-ink-muted">
                   <span>Chargeable Wt</span>
-                  <span className="font-semibold text-product-waypoint">{Number(pricing.chargeableWeight)} kg</span>
+                  <span className="font-semibold text-sky-400">{Number(pricing.chargeableWeight)} kg</span>
                 </div>
                 <div className="flex justify-between text-ink-muted">
                   <span>Base Charge</span>
@@ -272,7 +272,7 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
                 )}
                 <div className="flex justify-between border-t border-hairline pt-2 text-sm font-bold text-ink">
                   <span>Total Charge</span>
-                  <span className="text-product-terraform-bright">₹{Number(pricing.totalCharge).toFixed(2)}</span>
+                  <span className="text-sky-400">₹{Number(pricing.totalCharge).toFixed(2)}</span>
                 </div>
               </div>
             ) : (
@@ -289,12 +289,12 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
                   <div key={att.id} className="rounded-md border border-hairline bg-surface-2 p-2.5 text-xs font-mono space-y-1">
                     <div className="flex justify-between font-semibold">
                       <span className="text-ink">Attempt #{att.attemptNumber}</span>
-                      <span className={att.status === "DELIVERED" ? "text-product-nomad" : att.status === "FAILED" ? "text-product-consul" : "text-product-vault"}>
+                      <span className={att.status === "DELIVERED" ? "text-emerald-400" : att.status === "FAILED" ? "text-rose-400" : "text-amber-400"}>
                         {att.status}
                       </span>
                     </div>
                     {att.failureReason && (
-                      <div className="text-product-consul text-[11px]">
+                      <div className="text-rose-400 text-[11px]">
                         Reason: {att.failureReason.replace(/_/g, " ")}
                       </div>
                     )}

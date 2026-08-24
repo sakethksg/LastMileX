@@ -54,7 +54,7 @@ export function LoadingSkeleton({
       aria-label={message}
       className={`flex flex-col items-center justify-center py-16 gap-3 text-ink-muted ${className}`}
     >
-      <Loader2 className="h-7 w-7 animate-spin text-product-waypoint" aria-hidden="true" />
+      <Loader2 className="h-7 w-7 animate-spin text-sky-400" aria-hidden="true" />
       <p className="text-sm font-medium text-ink-muted">{message}</p>
       <span className="sr-only">{message}</span>
     </div>

@@ -58,7 +58,7 @@ export default function CustomerNotificationsPage() {
           {notifications.map((notif) => (
             <div
               key={notif.id}
-              className="card-surface-1 !p-4 space-y-1.5 transition hover:border-product-waypoint/40"
+              className="card-surface-1 !p-4 space-y-1.5 transition hover:border-hairline"
             >
               <div className="flex items-center justify-between gap-3">
                 <span className="font-semibold text-sm text-ink">{notif.title}</span>

@@ -32,11 +32,11 @@ export function Sidebar() {
     return pathname.startsWith(path);
   };
 
-  const linkClasses = (path: string, accentColor: string = "border-product-waypoint") => {
+  const linkClasses = (path: string) => {
     const active = isActive(path);
     return `flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition ${
       active
-        ? `bg-surface-2 text-ink border-l-2 ${accentColor} font-semibold`
+        ? "bg-surface-2 text-ink border-l-2 border-accent-blue font-semibold"
         : "text-ink-muted hover:bg-surface-2/60 hover:text-ink focus-visible:outline-2 focus-visible:outline-accent-blue"
     }`;
   };
@@ -49,20 +49,20 @@ export function Sidebar() {
           <div className="px-3 pb-1 text-eyebrow font-semibold uppercase tracking-eyebrow text-ink-subtle">
             Customer Portal
           </div>
-          <Link href="/dashboard" className={linkClasses("/dashboard", "border-product-waypoint")}>
-            <LayoutDashboard className="h-4 w-4 shrink-0 text-product-waypoint" aria-hidden="true" />
+          <Link href="/dashboard" className={linkClasses("/dashboard")}>
+            <LayoutDashboard className="h-4 w-4 shrink-0 text-ink-muted" aria-hidden="true" />
             <span>Dashboard</span>
           </Link>
-          <Link href="/orders/new" className={linkClasses("/orders/new", "border-product-terraform")}>
-            <PackagePlus className="h-4 w-4 shrink-0 text-product-terraform" aria-hidden="true" />
+          <Link href="/orders/new" className={linkClasses("/orders/new")}>
+            <PackagePlus className="h-4 w-4 shrink-0 text-ink-muted" aria-hidden="true" />
             <span>Create Shipment</span>
           </Link>
-          <Link href="/orders" className={linkClasses("/orders", "border-product-waypoint")}>
+          <Link href="/orders" className={linkClasses("/orders")}>
             <Package className="h-4 w-4 shrink-0 text-ink-muted" aria-hidden="true" />
             <span>My Orders</span>
           </Link>
-          <Link href="/notifications" className={linkClasses("/notifications", "border-product-vault")}>
-            <Bell className="h-4 w-4 shrink-0 text-product-vault" aria-hidden="true" />
+          <Link href="/notifications" className={linkClasses("/notifications")}>
+            <Bell className="h-4 w-4 shrink-0 text-ink-muted" aria-hidden="true" />
             <span>Notifications</span>
           </Link>
         </div>
@@ -74,12 +74,12 @@ export function Sidebar() {
           <div className="px-3 pb-1 text-eyebrow font-semibold uppercase tracking-eyebrow text-ink-subtle">
             Driver Portal
           </div>
-          <Link href="/agent/dashboard" className={linkClasses("/agent/dashboard", "border-product-vault")}>
-            <LayoutDashboard className="h-4 w-4 shrink-0 text-product-vault" aria-hidden="true" />
+          <Link href="/agent/dashboard" className={linkClasses("/agent/dashboard")}>
+            <LayoutDashboard className="h-4 w-4 shrink-0 text-ink-muted" aria-hidden="true" />
             <span>Driver Dashboard</span>
           </Link>
-          <Link href="/agent/orders" className={linkClasses("/agent/orders", "border-product-nomad")}>
-            <Truck className="h-4 w-4 shrink-0 text-product-nomad" aria-hidden="true" />
+          <Link href="/agent/orders" className={linkClasses("/agent/orders")}>
+            <Truck className="h-4 w-4 shrink-0 text-ink-muted" aria-hidden="true" />
             <span>Assigned Deliveries</span>
           </Link>
         </div>
@@ -91,20 +91,20 @@ export function Sidebar() {
           <div className="px-3 pb-1 text-eyebrow font-semibold uppercase tracking-eyebrow text-ink-subtle">
             Operations Console
           </div>
-          <Link href="/admin/dashboard" className={linkClasses("/admin/dashboard", "border-product-terraform")}>
-            <LayoutDashboard className="h-4 w-4 shrink-0 text-product-terraform" aria-hidden="true" />
+          <Link href="/admin/dashboard" className={linkClasses("/admin/dashboard")}>
+            <LayoutDashboard className="h-4 w-4 shrink-0 text-ink-muted" aria-hidden="true" />
             <span>Overview Dashboard</span>
           </Link>
-          <Link href="/admin/orders" className={linkClasses("/admin/orders", "border-product-consul")}>
-            <ClipboardList className="h-4 w-4 shrink-0 text-product-consul" aria-hidden="true" />
+          <Link href="/admin/orders" className={linkClasses("/admin/orders")}>
+            <ClipboardList className="h-4 w-4 shrink-0 text-ink-muted" aria-hidden="true" />
             <span>Orders & Dispatch</span>
           </Link>
-          <Link href="/admin/agents" className={linkClasses("/admin/agents", "border-product-nomad")}>
-            <Users className="h-4 w-4 shrink-0 text-product-nomad" aria-hidden="true" />
+          <Link href="/admin/agents" className={linkClasses("/admin/agents")}>
+            <Users className="h-4 w-4 shrink-0 text-ink-muted" aria-hidden="true" />
             <span>Delivery Fleet</span>
           </Link>
-          <Link href="/admin/notifications" className={linkClasses("/admin/notifications", "border-product-vault")}>
-            <Bell className="h-4 w-4 shrink-0 text-product-vault" aria-hidden="true" />
+          <Link href="/admin/notifications" className={linkClasses("/admin/notifications")}>
+            <Bell className="h-4 w-4 shrink-0 text-ink-muted" aria-hidden="true" />
             <span>Event Mesh & Retries</span>
           </Link>
         </div>

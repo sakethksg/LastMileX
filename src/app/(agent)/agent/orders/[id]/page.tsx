@@ -129,9 +129,9 @@ export default function AgentOrderExecutionPage({ params }: { params: Promise<{ 
       )}
 
       {/* STATE-DRIVEN EXECUTION ACTION BAR */}
-      <section aria-label="Delivery actions" className="card-surface-1 !border-product-waypoint/40 space-y-4">
+      <section aria-label="Delivery actions" className="card-surface-1 space-y-4">
         <div className="flex items-center justify-between border-b border-hairline-soft pb-2">
-          <h2 className="text-eyebrow font-semibold uppercase tracking-eyebrow text-product-waypoint">
+          <h2 className="text-eyebrow font-semibold uppercase tracking-eyebrow text-ink-subtle">
             Lifecycle Transition Actions
           </h2>
           <span className="text-[11px] font-mono text-ink-subtle">FSM Active</span>
@@ -144,7 +144,7 @@ export default function AgentOrderExecutionPage({ params }: { params: Promise<{ 
               onClick={() => executeAction(() => pickupOrder(orderId))}
               disabled={actionLoading}
               aria-busy={actionLoading}
-              className="btn-product-waypoint"
+              className="btn-primary"
             >
               {actionLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" aria-hidden="true" /> : <Package className="h-4 w-4 mr-2" aria-hidden="true" />}
               Confirm Package Pickup
@@ -157,7 +157,7 @@ export default function AgentOrderExecutionPage({ params }: { params: Promise<{ 
               onClick={() => executeAction(() => startDelivery(orderId))}
               disabled={actionLoading}
               aria-busy={actionLoading}
-              className="btn-product-terraform"
+              className="btn-primary"
             >
               {actionLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" aria-hidden="true" /> : <Truck className="h-4 w-4 mr-2" aria-hidden="true" />}
               Start Transit / Hub Transfer
@@ -170,7 +170,7 @@ export default function AgentOrderExecutionPage({ params }: { params: Promise<{ 
               onClick={() => executeAction(() => outForDelivery(orderId))}
               disabled={actionLoading}
               aria-busy={actionLoading}
-              className="btn-product-vault"
+              className="btn-primary"
             >
               {actionLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" aria-hidden="true" /> : <Navigation className="h-4 w-4 mr-2" aria-hidden="true" />}
               Mark Out for Delivery
@@ -184,7 +184,7 @@ export default function AgentOrderExecutionPage({ params }: { params: Promise<{ 
                 onClick={() => executeAction(() => completeDelivery(orderId))}
                 disabled={actionLoading}
                 aria-busy={actionLoading}
-                className="btn-product-nomad"
+                className="btn-primary"
               >
                 {actionLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" aria-hidden="true" /> : <CheckCircle2 className="h-4 w-4 mr-2" aria-hidden="true" />}
                 Complete Delivery
@@ -194,7 +194,7 @@ export default function AgentOrderExecutionPage({ params }: { params: Promise<{ 
                 type="button"
                 onClick={() => setIsFailing(true)}
                 disabled={actionLoading}
-                className="btn-product-consul"
+                className="btn-destructive"
               >
                 <AlertTriangle className="h-4 w-4 mr-2" aria-hidden="true" />
                 Report Delivery Failure
@@ -203,14 +203,14 @@ export default function AgentOrderExecutionPage({ params }: { params: Promise<{ 
           )}
 
           {order.status === OrderStatus.DELIVERED && (
-            <div className="flex items-center gap-2 text-sm font-semibold text-product-nomad bg-product-nomad/10 border border-product-nomad/30 px-4 py-2 rounded-md">
+            <div className="flex items-center gap-2 text-sm font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-4 py-2 rounded-md">
               <CheckCircle2 className="h-5 w-5" aria-hidden="true" />
               Delivery Successfully Completed
             </div>
           )}
 
           {order.status === OrderStatus.FAILED && (
-            <div className="flex items-center gap-2 text-sm font-semibold text-product-consul bg-product-consul/10 border border-product-consul/30 px-4 py-2 rounded-md">
+            <div className="flex items-center gap-2 text-sm font-semibold text-rose-400 bg-rose-500/10 border border-rose-500/20 px-4 py-2 rounded-md">
               <AlertTriangle className="h-5 w-5" aria-hidden="true" />
               Delivery Attempt Marked as Failed
             </div>
@@ -271,7 +271,7 @@ export default function AgentOrderExecutionPage({ params }: { params: Promise<{ 
               type="submit"
               disabled={actionLoading}
               aria-busy={actionLoading}
-              className="btn-product-consul !px-4 !py-2 text-xs"
+              className="btn-destructive !px-4 !py-2 text-xs"
             >
               {actionLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" aria-hidden="true" /> : null}
               Confirm Failure
@@ -284,7 +284,7 @@ export default function AgentOrderExecutionPage({ params }: { params: Promise<{ 
       <div className="grid md:grid-cols-2 gap-6">
         <section aria-label="Destination details" className="card-surface-1 space-y-4">
           <h2 className="text-base font-bold text-ink flex items-center gap-2">
-            <MapPin className="h-5 w-5 text-product-waypoint" aria-hidden="true" />
+            <MapPin className="h-5 w-5 text-sky-400" aria-hidden="true" />
             Destination & Location
           </h2>
 
@@ -305,7 +305,7 @@ export default function AgentOrderExecutionPage({ params }: { params: Promise<{ 
 
         <section aria-label="Package specifications" className="card-surface-1 space-y-4">
           <h2 className="text-base font-bold text-ink flex items-center gap-2">
-            <Package className="h-5 w-5 text-product-terraform-bright" aria-hidden="true" />
+            <Package className="h-5 w-5 text-indigo-400" aria-hidden="true" />
             Package & Payment Specs
           </h2>
 
@@ -316,7 +316,7 @@ export default function AgentOrderExecutionPage({ params }: { params: Promise<{ 
             </div>
             <div className="flex justify-between py-1.5 border-b border-hairline-soft">
               <span className="text-ink-muted font-sans">Package Weight</span>
-              <span className="font-bold text-product-waypoint">{order.actualWeight} kg</span>
+              <span className="font-bold text-sky-400">{order.actualWeight} kg</span>
             </div>
             <div className="flex justify-between py-1.5 border-b border-hairline-soft">
               <span className="text-ink-muted font-sans">Dimensions</span>

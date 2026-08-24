@@ -116,7 +116,7 @@ export default function CreateShipmentPage() {
       {step === 1 && (
         <form onSubmit={handleCalculateQuote} className="card-surface-1 space-y-6">
           <h2 className="text-base font-bold text-ink flex items-center gap-2 border-b border-hairline-soft pb-3">
-            <Truck className="h-5 w-5 text-product-waypoint" aria-hidden="true" />
+            <Truck className="h-5 w-5 text-sky-400" aria-hidden="true" />
             1. Pickup & Delivery Locations
           </h2>
 
@@ -185,7 +185,7 @@ export default function CreateShipmentPage() {
           </div>
 
           <h2 className="text-base font-bold text-ink flex items-center gap-2 border-b border-hairline-soft pb-3 pt-2">
-            <Package className="h-5 w-5 text-product-terraform-bright" aria-hidden="true" />
+            <Package className="h-5 w-5 text-indigo-400" aria-hidden="true" />
             2. Package Dimensions & Weight
           </h2>
 
@@ -293,7 +293,7 @@ export default function CreateShipmentPage() {
         <div className="card-surface-1 space-y-6">
           <div className="flex items-center justify-between border-b border-hairline-soft pb-4">
             <h2 className="text-lg font-bold text-ink">Review Pricing Breakdown</h2>
-            <span className="rounded-xs bg-product-terraform/20 px-3 py-1 text-xs font-mono font-bold text-product-terraform-bright border border-product-terraform/30">
+            <span className="rounded-xs bg-indigo-500/10 px-3 py-1 text-xs font-mono font-bold text-indigo-400 border border-indigo-500/20">
               {quote.rateCardName}
             </span>
           </div>
@@ -308,7 +308,7 @@ export default function CreateShipmentPage() {
             <div>
               <div className="text-xs font-semibold text-ink-subtle uppercase">Weight Charge Factor</div>
               <div className="font-medium text-ink mt-0.5">
-                Chargeable: <span className="font-bold text-product-waypoint">{quote.chargeableWeight} kg</span> (Actual: {quote.actualWeight} kg, Volumetric: {quote.volumetricWeight} kg)
+                Chargeable: <span className="font-bold text-sky-400">{quote.chargeableWeight} kg</span> (Actual: {quote.actualWeight} kg, Volumetric: {quote.volumetricWeight} kg)
               </div>
             </div>
           </div>
@@ -326,7 +326,7 @@ export default function CreateShipmentPage() {
             )}
             <div className="flex justify-between font-bold text-base text-ink pt-2 border-t border-hairline">
               <span>Total Estimated Charge</span>
-              <span className="text-product-terraform-bright">₹{quote.totalCharge.toFixed(2)}</span>
+              <span className="text-sky-400">₹{quote.totalCharge.toFixed(2)}</span>
             </div>
           </div>
 

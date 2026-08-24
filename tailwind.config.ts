@@ -25,25 +25,10 @@ const config: Config = {
         "inverse-canvas": "#ffffff",
         "inverse-ink": "#000000",
 
-        // Per-Product Color Tokens
-        "product-terraform": "#7b42bc",
-        "product-terraform-bright": "#911ced",
-        "product-vault": "#ffcf25",
-        "product-consul": "#e62b1e",
-        "product-waypoint": "#14c6cb",
-        "product-waypoint-deep": "#12b6bb",
-        "product-vagrant": "#1868f2",
-        "product-nomad": "#00ca8e",
-        "product-boundary": "#f24c53",
-
         // Semantic & Accents
-        "amber-100": "#fbeabf",
-        "amber-200": "#bb5a00",
-        "blue-7": "#101a59",
-        "semantic-success": "#00ca8e",
-        "semantic-warning": "#ffcf25",
-        "semantic-error": "#e62b1e",
-        "semantic-visited": "#a737ff",
+        "semantic-success": "#10b981",
+        "semantic-warning": "#f59e0b",
+        "semantic-error": "#ef4444",
 
         // Compatibility aliases
         background: "#000000",

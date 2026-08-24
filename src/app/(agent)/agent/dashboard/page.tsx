@@ -75,8 +75,8 @@ export default function AgentDashboardPage() {
       {/* Metrics Cards */}
       <section aria-label="Performance metrics" className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <div className="card-surface-1 p-5">
-          <div className="flex items-center gap-2 text-eyebrow font-semibold uppercase tracking-eyebrow text-product-vault">
-            <Truck className="h-3.5 w-3.5 text-product-vault" aria-hidden="true" />
+          <div className="flex items-center gap-2 text-eyebrow font-semibold uppercase tracking-eyebrow text-amber-400">
+            <Truck className="h-3.5 w-3.5 text-amber-400" aria-hidden="true" />
             Active Workload
           </div>
           <div className="mt-2 flex items-baseline gap-2">
@@ -89,29 +89,29 @@ export default function AgentDashboardPage() {
         </div>
 
         <div className="card-surface-1 p-5">
-          <div className="flex items-center gap-2 text-eyebrow font-semibold uppercase tracking-eyebrow text-product-nomad">
-            <CheckCircle2 className="h-3.5 w-3.5 text-product-nomad" aria-hidden="true" />
+          <div className="flex items-center gap-2 text-eyebrow font-semibold uppercase tracking-eyebrow text-emerald-400">
+            <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" aria-hidden="true" />
             Completed Today
           </div>
-          <div className="mt-2 text-2xl font-bold text-product-nomad">{metrics.today.completed}</div>
+          <div className="mt-2 text-2xl font-bold text-emerald-400">{metrics.today.completed}</div>
           <div className="mt-1 text-[11px] text-ink-subtle font-mono">{metrics.allTime.completed} all-time</div>
         </div>
 
         <div className="card-surface-1 p-5">
-          <div className="flex items-center gap-2 text-eyebrow font-semibold uppercase tracking-eyebrow text-product-consul">
-            <AlertTriangle className="h-3.5 w-3.5 text-product-consul" aria-hidden="true" />
+          <div className="flex items-center gap-2 text-eyebrow font-semibold uppercase tracking-eyebrow text-rose-400">
+            <AlertTriangle className="h-3.5 w-3.5 text-rose-400" aria-hidden="true" />
             Failed Today
           </div>
-          <div className="mt-2 text-2xl font-bold text-product-consul">{metrics.today.failed}</div>
+          <div className="mt-2 text-2xl font-bold text-rose-400">{metrics.today.failed}</div>
           <div className="mt-1 text-[11px] text-ink-subtle font-mono">{metrics.allTime.failed} all-time</div>
         </div>
 
         <div className="card-surface-1 p-5">
-          <div className="flex items-center gap-2 text-eyebrow font-semibold uppercase tracking-eyebrow text-product-terraform-bright">
-            <TrendingUp className="h-3.5 w-3.5 text-product-terraform-bright" aria-hidden="true" />
+          <div className="flex items-center gap-2 text-eyebrow font-semibold uppercase tracking-eyebrow text-sky-400">
+            <TrendingUp className="h-3.5 w-3.5 text-sky-400" aria-hidden="true" />
             Success Rate
           </div>
-          <div className="mt-2 text-2xl font-bold text-product-terraform-bright">{metrics.successRate}%</div>
+          <div className="mt-2 text-2xl font-bold text-sky-400">{metrics.successRate}%</div>
           <div className="mt-1 text-[11px] text-ink-subtle font-mono">Completion ratio</div>
         </div>
       </section>
@@ -120,10 +120,10 @@ export default function AgentDashboardPage() {
       <section aria-label="Assigned deliveries" className="card-surface-1 space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-bold text-ink flex items-center gap-2">
-            <Layers className="h-5 w-5 text-product-vault" aria-hidden="true" />
+            <Layers className="h-5 w-5 text-amber-400" aria-hidden="true" />
             Currently Assigned Deliveries ({activeOrders.length})
           </h2>
-          <Link href="/agent/orders" className="text-xs font-semibold text-product-vault hover:underline focus-visible:outline-2 focus-visible:outline-accent-blue rounded-xs">
+          <Link href="/agent/orders" className="text-xs font-semibold text-amber-400 hover:underline focus-visible:outline-2 focus-visible:outline-accent-blue rounded-xs">
             View all assignments
           </Link>
         </div>
@@ -160,7 +160,7 @@ export default function AgentDashboardPage() {
 
                 <Link
                   href={`/agent/orders/${order.id}`}
-                  className="btn-product-vault !px-3 !py-1.5 text-xs w-full text-center"
+                  className="btn-primary !px-3 !py-1.5 text-xs w-full text-center"
                 >
                   Execute Delivery Actions <ArrowRight className="h-3.5 w-3.5 ml-1.5" aria-hidden="true" />
                 </Link>

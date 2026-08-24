@@ -78,7 +78,7 @@ export default function AdminNotificationsPage() {
       />
 
       {actionMessage && (
-        <div role="status" className="rounded-md bg-product-nomad/10 border border-product-nomad/30 p-3 text-xs font-mono font-semibold text-product-nomad flex items-center gap-2">
+        <div role="status" className="rounded-md bg-emerald-500/10 border border-emerald-500/20 p-3 text-xs font-mono font-semibold text-emerald-400 flex items-center gap-2">
           <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
           <span>{actionMessage}</span>
         </div>
@@ -148,7 +148,7 @@ export default function AdminNotificationsPage() {
                           onClick={() => handleRetry(notif.id)}
                           disabled={retryingId === notif.id}
                           aria-busy={retryingId === notif.id}
-                          className="btn-product-consul !px-2.5 !py-1 text-xs"
+                          className="btn-destructive !px-2.5 !py-1 text-xs"
                         >
                           {retryingId === notif.id ? (
                             <Loader2 className="h-3 w-3 animate-spin mr-1" aria-hidden="true" />

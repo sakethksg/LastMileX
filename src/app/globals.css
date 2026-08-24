@@ -15,12 +15,6 @@
   --ink-muted: #b2b6bd;
   --ink-subtle: #656a76;
   --accent-blue: #2b89ff;
-  --product-terraform: #7b42bc;
-  --product-vault: #ffcf25;
-  --product-waypoint: #14c6cb;
-  --product-consul: #e62b1e;
-  --product-nomad: #00ca8e;
-  --product-vagrant: #1868f2;
 }
 
 html {
@@ -58,7 +52,7 @@ body {
 }
 
 @layer components {
-  /* HashiCorp Buttons */
+  /* System Buttons */
   .btn-primary {
     @apply inline-flex items-center justify-center font-semibold text-inverse-ink bg-inverse-canvas rounded-md px-[18px] py-[10px] text-button transition hover:opacity-90 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
   }
@@ -71,24 +65,8 @@ body {
     @apply inline-flex items-center justify-center font-semibold text-ink bg-canvas hover:bg-surface-1 border border-hairline-soft rounded-md px-[18px] py-[10px] text-button transition active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
-  .btn-product-terraform {
-    @apply inline-flex items-center justify-center font-semibold text-white bg-product-terraform hover:bg-product-terraform-bright rounded-md px-[18px] py-[10px] text-button transition active:scale-[0.98] disabled:opacity-50;
-  }
-
-  .btn-product-vault {
-    @apply inline-flex items-center justify-center font-semibold text-inverse-ink bg-product-vault hover:brightness-110 rounded-md px-[18px] py-[10px] text-button transition active:scale-[0.98] disabled:opacity-50;
-  }
-
-  .btn-product-waypoint {
-    @apply inline-flex items-center justify-center font-semibold text-inverse-ink bg-product-waypoint hover:bg-product-waypoint-deep rounded-md px-[18px] py-[10px] text-button transition active:scale-[0.98] disabled:opacity-50;
-  }
-
-  .btn-product-nomad {
-    @apply inline-flex items-center justify-center font-semibold text-inverse-ink bg-product-nomad hover:brightness-110 rounded-md px-[18px] py-[10px] text-button transition active:scale-[0.98] disabled:opacity-50;
-  }
-
-  .btn-product-consul {
-    @apply inline-flex items-center justify-center font-semibold text-white bg-product-consul hover:brightness-110 rounded-md px-[18px] py-[10px] text-button transition active:scale-[0.98] disabled:opacity-50;
+  .btn-destructive {
+    @apply inline-flex items-center justify-center font-semibold text-white bg-rose-600 hover:bg-rose-700 rounded-md px-[18px] py-[10px] text-button transition active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
   /* HashiCorp Cards */

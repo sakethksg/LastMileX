@@ -11,6 +11,11 @@ import {
   Workflow,
   Check,
   ChevronRight,
+  Truck,
+  Package,
+  MapPin,
+  Clock,
+  Zap,
 } from "lucide-react";
 
 export default function HomePage() {
@@ -42,21 +47,21 @@ export default function HomePage() {
   return (
     <div className="w-full bg-canvas text-ink">
       {/* 1. HERO SECTION */}
-      <section className="relative overflow-hidden border-b border-hairline-soft pt-10 pb-16 md:pt-16 md:pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="grid lg:grid-cols-12 gap-10 lg:gap-16 items-center">
+      <section className="relative overflow-hidden border-b border-hairline-soft pt-12 pb-16 md:pt-20 md:pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-center">
           {/* Left Column: Copy */}
           <div className="lg:col-span-7 space-y-6">
-            <div className="eyebrow-label flex items-center gap-2 text-product-waypoint">
-              <span className="h-1.5 w-1.5 rounded-full bg-product-waypoint animate-pulse"></span>
-              Dispatch infrastructure for teams that deliver
+            <div className="eyebrow-label flex items-center gap-2 text-sky-400">
+              <span className="h-1.5 w-1.5 rounded-full bg-sky-400"></span>
+              Enterprise Last-Mile Logistics Infrastructure
             </div>
 
-            <h1 className="max-w-4xl text-4xl sm:text-6xl lg:text-[68px] xl:text-display-xl font-bold text-ink tracking-tightest leading-[1.08]">
+            <h1 className="max-w-4xl text-4xl sm:text-5xl lg:text-display-lg font-bold text-ink tracking-tight leading-[1.1]">
               Every shipment. Accounted for.
             </h1>
 
-            <p className="text-body-lg text-ink-muted leading-[1.55] max-w-xl">
-              Quote accurately, assign intelligently, and keep an immutable record of every delivery from pickup to proof of delivery.
+            <p className="text-body-lg text-ink-muted leading-relaxed max-w-xl">
+              Quote accurately, assign drivers automatically, and maintain an immutable record of every delivery from pickup to proof of delivery.
             </p>
 
             <div className="flex flex-wrap items-center gap-3 pt-2">
@@ -64,7 +69,7 @@ export default function HomePage() {
                 href={getDashboardHref()}
                 className="btn-primary"
               >
-                <span>{user ? "Open your console" : "Start dispatching"}</span>
+                <span>{user ? "Open Console" : "Start Dispatching"}</span>
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
 
@@ -72,105 +77,95 @@ export default function HomePage() {
                 href="/orders/new"
                 className="btn-secondary"
               >
-                <Calculator className="mr-2 h-4 w-4 text-product-waypoint" />
-                <span>Calculate a quote</span>
+                <Calculator className="mr-2 h-4 w-4 text-ink-muted" />
+                <span>Calculate Quote</span>
               </Link>
             </div>
 
-            {/* Architecture Identity Pills */}
-            <div className="pt-7 border-t border-hairline-soft flex flex-wrap items-center gap-x-4 gap-y-2 text-caption text-ink-subtle">
-              <span className="font-mono text-ink-muted">Built for control:</span>
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-pill bg-surface-1 border border-hairline text-ink-muted">
-                <span className="h-2 w-2 rounded-full bg-product-terraform"></span>
-                <span>Terraform Quoting</span>
+            {/* Logistics Feature Capabilities */}
+            <div className="pt-8 border-t border-hairline-soft flex flex-wrap items-center gap-x-6 gap-y-3 text-caption text-ink-muted">
+              <div className="flex items-center gap-2">
+                <Check className="h-4 w-4 text-emerald-400" />
+                <span>Volumetric Weight Rating</span>
               </div>
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-pill bg-surface-1 border border-hairline text-ink-muted">
-                <span className="h-2 w-2 rounded-full bg-product-vault"></span>
-                <span>Vault Custody</span>
+              <div className="flex items-center gap-2">
+                <Check className="h-4 w-4 text-emerald-400" />
+                <span>Automated Driver Dispatch</span>
               </div>
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-pill bg-surface-1 border border-hairline text-ink-muted">
-                <span className="h-2 w-2 rounded-full bg-product-waypoint"></span>
-                <span>Waypoint FSM</span>
-              </div>
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-pill bg-surface-1 border border-hairline text-ink-muted">
-                <span className="h-2 w-2 rounded-full bg-product-nomad"></span>
-                <span>Nomad Dispatch</span>
+              <div className="flex items-center gap-2">
+                <Check className="h-4 w-4 text-emerald-400" />
+                <span>Immutable Audit Logs</span>
               </div>
             </div>
           </div>
 
-          {/* Right Column: 3D Isometric Visual Canvas */}
+          {/* Right Column: Live Tracking & Telemetry Terminal Preview */}
           <div className="lg:col-span-5 relative">
-            <div className="relative rounded-lg bg-surface-1 border border-hairline p-5 sm:p-6 shadow-2xl space-y-4 overflow-hidden">
-              {/* Header bar of mock telemetry terminal */}
-              <div className="flex items-center justify-between border-b border-hairline pb-3">
+            <div className="relative rounded-lg bg-surface-1 border border-hairline p-5 sm:p-6 space-y-4 overflow-hidden">
+              {/* Header bar of dispatch preview */}
+              <div className="flex items-center justify-between border-b border-hairline-soft pb-3">
                 <div className="flex items-center gap-2">
-                  <div className="h-2.5 w-2.5 rounded-full bg-product-consul/80"></div>
-                  <div className="h-2.5 w-2.5 rounded-full bg-product-vault/80"></div>
-                  <div className="h-2.5 w-2.5 rounded-full bg-product-nomad/80"></div>
-                  <span className="ml-2 font-mono text-[11px] text-ink-subtle">
-                    dispatch-console / live-order
-                  </span>
+                  <span className="font-mono text-xs font-semibold text-ink">ORDER #LX-9482</span>
+                  <span className="text-caption text-ink-subtle">· Intra-Zone</span>
                 </div>
-                <span className="font-mono text-[10px] text-product-nomad bg-product-nomad/10 px-2 py-0.5 rounded-xs border border-product-nomad/20">
-                  HEALTHY
+                <span className="font-mono text-[11px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-xs border border-emerald-500/20 font-medium">
+                  IN TRANSIT
                 </span>
               </div>
 
-              {/* Telemetry Visual Cards */}
-              <div className="space-y-3 font-mono text-xs">
-                {/* State Machine Transition Node */}
-                <div className="rounded-md bg-surface-2 p-3.5 border border-hairline space-y-2">
+              {/* Live Dispatch Steps */}
+              <div className="space-y-3 font-sans text-xs">
+                <div className="rounded-md bg-surface-2 p-3.5 border border-hairline-soft space-y-2">
                   <div className="flex items-center justify-between text-ink-muted">
-                    <span className="text-[11px] uppercase tracking-wider text-product-waypoint flex items-center gap-1.5">
-                      <Workflow className="h-3.5 w-3.5" />
-                      FSM Transition Engine
+                    <span className="text-[11px] font-semibold uppercase tracking-wider text-ink flex items-center gap-1.5">
+                      <Workflow className="h-3.5 w-3.5 text-sky-400" />
+                      Lifecycle Pipeline
                     </span>
-                    <span className="text-[10px] text-ink-subtle">LATENCY: 1.2ms</span>
+                    <span className="font-mono text-[10px] text-ink-subtle">LATENCY: &lt; 2ms</span>
                   </div>
-                  <div className="flex items-center justify-between text-[11px] pt-1">
-                    <span className="text-ink-muted">CREATED</span>
-                    <span className="text-product-waypoint">&rarr;</span>
-                    <span className="text-ink-muted">ASSIGNED</span>
-                    <span className="text-product-waypoint">&rarr;</span>
-                    <span className="text-product-waypoint font-bold">IN_TRANSIT</span>
-                    <span className="text-product-waypoint">&rarr;</span>
-                    <span className="text-product-nomad font-bold">DELIVERED</span>
+                  <div className="flex items-center justify-between text-[11px] pt-1 font-mono">
+                    <span className="text-ink-subtle">CONFIRMED</span>
+                    <span className="text-sky-400">&rarr;</span>
+                    <span className="text-ink-subtle">ASSIGNED</span>
+                    <span className="text-sky-400">&rarr;</span>
+                    <span className="text-sky-400 font-bold">IN_TRANSIT</span>
+                    <span className="text-ink-subtle">&rarr;</span>
+                    <span className="text-ink-subtle">DELIVERED</span>
                   </div>
                 </div>
 
-                {/* Rate Snapshot Node */}
-                <div className="rounded-md bg-surface-2 p-3.5 border border-hairline space-y-2">
+                {/* Rate Breakdown */}
+                <div className="rounded-md bg-surface-2 p-3.5 border border-hairline-soft space-y-2">
                   <div className="flex items-center justify-between text-ink-muted">
-                    <span className="text-[11px] uppercase tracking-wider text-product-terraform-bright flex items-center gap-1.5">
-                      <Calculator className="h-3.5 w-3.5" />
-                      Deterministic Rate Quoting
+                    <span className="text-[11px] font-semibold uppercase tracking-wider text-ink flex items-center gap-1.5">
+                      <Calculator className="h-3.5 w-3.5 text-indigo-400" />
+                      Rate Snapshot
                     </span>
-                    <span className="text-product-terraform-bright text-[10px]">LXV-5000</span>
+                    <span className="font-mono text-ink-muted font-bold text-xs">₹160.00</span>
                   </div>
-                  <div className="grid grid-cols-2 gap-2 text-[11px] pt-1">
+                  <div className="grid grid-cols-2 gap-2 text-[11px] font-mono pt-1">
                     <div>
                       <span className="text-ink-subtle">VOLUMETRIC: </span>
-                      <span className="text-ink font-semibold">1.50 kg</span>
+                      <span className="text-ink font-semibold">{volumetricWeight} kg</span>
                     </div>
                     <div>
                       <span className="text-ink-subtle">CHARGEABLE: </span>
-                      <span className="text-ink font-semibold">2.00 kg</span>
+                      <span className="text-ink font-semibold">{chargeableWeight} kg</span>
                     </div>
                   </div>
                 </div>
 
-                {/* Security Vault Custody */}
-                <div className="rounded-md bg-surface-2 p-3.5 border border-hairline flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <ShieldCheck className="h-4 w-4 text-product-vault" />
+                {/* Driver & Route Status */}
+                <div className="rounded-md bg-surface-2 p-3.5 border border-hairline-soft flex items-center justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <Truck className="h-4 w-4 text-emerald-400" />
                     <div>
-                      <div className="text-[11px] font-semibold text-ink">Cryptographic Event Log</div>
-                      <div className="text-[10px] text-ink-subtle">SHA-256 State Verification</div>
+                      <div className="text-[12px] font-semibold text-ink">Driver #AG-102 (Rajesh K.)</div>
+                      <div className="text-[10px] sm:text-[11px] text-ink-muted">Zone A · 2 active deliveries</div>
                     </div>
                   </div>
-                  <span className="text-[11px] font-mono text-product-vault font-semibold">
-                    IMMUTABLE
+                  <span className="text-[10px] font-mono bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-xs border border-emerald-500/20">
+                    ASSIGNED
                   </span>
                 </div>
               </div>
@@ -179,151 +174,151 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 2. SIGNATURE PRODUCT IDENTITY CARDS SECTION */}
-      <section className="py-24 border-t border-hairline-soft bg-canvas">
+      {/* 2. PRODUCT CAPABILITIES SECTION */}
+      <section className="py-20 border-t border-hairline-soft bg-canvas">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
           <div className="space-y-3">
             <div className="eyebrow-label">
-              Integrated Product Ecosystem
+              Integrated Capabilities
             </div>
-            <h2 className="text-3xl sm:text-display-md font-bold text-ink tracking-tight">
-              Six Purpose-Engineered Modules. One Cohesive Fabric.
+            <h2 className="text-2xl sm:text-headline font-bold text-ink tracking-tight">
+              Engineered for Enterprise Logistics Control
             </h2>
             <p className="text-body text-ink-muted max-w-2xl leading-relaxed">
-              Every stage of the dispatch lifecycle is anchored by a dedicated product engine with unmistakable chromatic identity.
+              Every stage of the dispatch lifecycle is supported by explicit business rules, rate settlement matrices, and role clearance bounds.
             </p>
           </div>
 
-          {/* 3-Column Product Grid */}
+          {/* 3-Column Capability Grid */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* 1. TERRAFORM CARD - Violet Ground */}
-            <div className="rounded-lg bg-product-terraform p-6 text-white space-y-4 transition hover:brightness-105">
+            {/* 1. RATE ENGINE */}
+            <div className="card-surface-1 space-y-4 hover:border-hairline transition">
               <div className="flex items-center justify-between">
-                <div className="text-eyebrow font-semibold uppercase tracking-eyebrow text-white/80">
-                  Rate Engine Module
+                <div className="text-eyebrow font-semibold uppercase text-ink-subtle">
+                  Pricing & Settlement
                 </div>
-                <div className="h-2 w-2 rounded-full bg-white"></div>
-              </div>
-              <h3 className="text-card-title font-bold text-white tracking-tight">
-                Deterministic Surcharging
-              </h3>
-              <p className="text-body-sm text-white/90 leading-relaxed">
-                Computes volumetric and actual mass against zone slab matrices. Creates immutable rate snapshots to eliminate invoice drift and reconciliation disputes.
-              </p>
-              <div className="pt-4 border-t border-white/20 flex items-center justify-between text-xs font-semibold">
-                <span>Volumetric Quotient: 5000</span>
-                <Link href="/orders/new" className="inline-flex items-center gap-1 text-white hover:underline">
-                  Explore Engine <ChevronRight className="h-3.5 w-3.5" />
-                </Link>
-              </div>
-            </div>
-
-            {/* 2. VAULT CARD - Yellow Ground (Dark Text) */}
-            <div className="rounded-lg bg-product-vault p-6 text-inverse-ink space-y-4 transition hover:brightness-105">
-              <div className="flex items-center justify-between">
-                <div className="text-eyebrow font-semibold uppercase tracking-eyebrow text-inverse-ink/80">
-                  Security & Audit
-                </div>
-                <div className="h-2 w-2 rounded-full bg-inverse-ink"></div>
-              </div>
-              <h3 className="text-card-title font-bold text-inverse-ink tracking-tight">
-                Cryptographic Custody
-              </h3>
-              <p className="text-body-sm text-inverse-ink/90 leading-relaxed">
-                Enforces strict Row-Level Security, multi-tenant workspace isolation, role clearance validation, and append-only attempt event histories.
-              </p>
-              <div className="pt-4 border-t border-inverse-ink/20 flex items-center justify-between text-xs font-semibold">
-                <span>Zero-Trust RBAC Model</span>
-                <Link href="/login" className="inline-flex items-center gap-1 text-inverse-ink hover:underline">
-                  View Security <ChevronRight className="h-3.5 w-3.5" />
-                </Link>
-              </div>
-            </div>
-
-            {/* 3. WAYPOINT CARD - Cyan Ground (Dark Text) */}
-            <div className="rounded-lg bg-product-waypoint p-6 text-inverse-ink space-y-4 transition hover:brightness-105">
-              <div className="flex items-center justify-between">
-                <div className="text-eyebrow font-semibold uppercase tracking-eyebrow text-inverse-ink/80">
-                  Lifecycle Pipeline
-                </div>
-                <div className="h-2 w-2 rounded-full bg-inverse-ink"></div>
-              </div>
-              <h3 className="text-card-title font-bold text-inverse-ink tracking-tight">
-                Finite State Machine
-              </h3>
-              <p className="text-body-sm text-inverse-ink/90 leading-relaxed">
-                Deterministic lifecycle transitions guarantee that packages cannot bypass checkpoints or jump backwards. Sealed terminal delivered states are inviolable.
-              </p>
-              <div className="pt-4 border-t border-inverse-ink/20 flex items-center justify-between text-xs font-semibold">
-                <span>Formal FSM Verification</span>
-                <Link href="/dashboard" className="inline-flex items-center gap-1 text-inverse-ink hover:underline">
-                  Inspect States <ChevronRight className="h-3.5 w-3.5" />
-                </Link>
-              </div>
-            </div>
-
-            {/* 4. NOMAD CARD - Charcoal Surface 1 with Nomad Green Identity */}
-            <div className="card-surface-1 space-y-4 transition hover:border-product-nomad/50">
-              <div className="flex items-center justify-between">
-                <div className="text-eyebrow font-semibold uppercase tracking-eyebrow text-product-nomad">
-                  Fleet Orchestration
-                </div>
-                <div className="h-2 w-2 rounded-full bg-product-nomad"></div>
+                <Calculator className="h-4 w-4 text-sky-400" />
               </div>
               <h3 className="text-card-title font-bold text-ink tracking-tight">
-                Autonomous Auto-Assignment
+                Volumetric Rate Engine
               </h3>
               <p className="text-body-sm text-ink-muted leading-relaxed">
-                Scores available drivers using active load balancing, geographic zone proximity, and vehicle capacity to achieve optimal sub-second dispatch assignment.
+                Calculates actual vs. volumetric weight, evaluates zone slab matrices, and creates immutable rate snapshots upon order confirmation.
               </p>
-              <div className="pt-4 border-t border-hairline-soft flex items-center justify-between text-xs font-semibold">
-                <span className="text-ink-subtle">Load Factor Balancing</span>
-                <Link href="/agent/dashboard" className="inline-flex items-center gap-1 text-product-nomad hover:underline">
-                  Driver Portal <ChevronRight className="h-3.5 w-3.5" />
+              <div className="pt-4 border-t border-hairline-soft flex items-center justify-between text-xs">
+                <span className="text-ink-subtle font-mono">Volumetric Quotient: 5000</span>
+                <Link href="/orders/new" className="inline-flex items-center gap-1 text-ink font-semibold hover:underline">
+                  Rate Calculator <ChevronRight className="h-3.5 w-3.5" />
                 </Link>
               </div>
             </div>
 
-            {/* 5. CONSUL CARD - Charcoal Surface 1 with Consul Red Identity */}
-            <div className="card-surface-1 space-y-4 transition hover:border-product-consul/50">
+            {/* 2. STATE MACHINE */}
+            <div className="card-surface-1 space-y-4 hover:border-hairline transition">
               <div className="flex items-center justify-between">
-                <div className="text-eyebrow font-semibold uppercase tracking-eyebrow text-product-consul">
-                  Event Mesh & Routing
+                <div className="text-eyebrow font-semibold uppercase text-ink-subtle">
+                  Workflow Control
                 </div>
-                <div className="h-2 w-2 rounded-full bg-product-consul"></div>
+                <Workflow className="h-4 w-4 text-indigo-400" />
               </div>
               <h3 className="text-card-title font-bold text-ink tracking-tight">
-                Idempotent Notifications
+                Order Lifecycle Engine
               </h3>
               <p className="text-body-sm text-ink-muted leading-relaxed">
-                Asynchronous event webhooks decoupled from transactional writes. Employs exponential backoff retry algorithms to guarantee delivery across noisy channels.
+                Strict 10-state lifecycle transitions prevent out-of-order state updates and append immutable tracking event histories.
               </p>
-              <div className="pt-4 border-t border-hairline-soft flex items-center justify-between text-xs font-semibold">
-                <span className="text-ink-subtle">Exponential Backoff</span>
-                <Link href="/admin/notifications" className="inline-flex items-center gap-1 text-product-consul hover:underline">
-                  Notification Ops <ChevronRight className="h-3.5 w-3.5" />
+              <div className="pt-4 border-t border-hairline-soft flex items-center justify-between text-xs">
+                <span className="text-ink-subtle font-mono">10 Lifecycle States</span>
+                <Link href="/dashboard" className="inline-flex items-center gap-1 text-ink font-semibold hover:underline">
+                  View Timeline <ChevronRight className="h-3.5 w-3.5" />
                 </Link>
               </div>
             </div>
 
-            {/* 6. VAGRANT CARD - Charcoal Surface 1 with Vagrant Blue Identity */}
-            <div className="card-surface-1 space-y-4 transition hover:border-product-vagrant/50">
+            {/* 3. DISPATCH ASSIGNMENT */}
+            <div className="card-surface-1 space-y-4 hover:border-hairline transition">
               <div className="flex items-center justify-between">
-                <div className="text-eyebrow font-semibold uppercase tracking-eyebrow text-product-vagrant">
-                  Developer Platform
+                <div className="text-eyebrow font-semibold uppercase text-ink-subtle">
+                  Fleet Automation
                 </div>
-                <div className="h-2 w-2 rounded-full bg-product-vagrant"></div>
+                <Truck className="h-4 w-4 text-emerald-400" />
               </div>
               <h3 className="text-card-title font-bold text-ink tracking-tight">
-                Developer Sandboxing
+                Automated Driver Dispatch
               </h3>
               <p className="text-body-sm text-ink-muted leading-relaxed">
-                Complete REST APIs, TypeScript type bindings, deterministic test seeds, and sandbox simulation environments for building high-throughput logistics integrations.
+                Deterministic driver scoring matches availability, zone coverage, active workload limits, and proximity with race-condition protection.
               </p>
-              <div className="pt-4 border-t border-hairline-soft flex items-center justify-between text-xs font-semibold">
-                <span className="text-ink-subtle">REST / TypeScript API</span>
-                <Link href="/orders/new" className="inline-flex items-center gap-1 text-product-vagrant hover:underline">
-                  API Docs <ChevronRight className="h-3.5 w-3.5" />
+              <div className="pt-4 border-t border-hairline-soft flex items-center justify-between text-xs">
+                <span className="text-ink-subtle font-mono">Concurrency Protection</span>
+                <Link href="/agent/dashboard" className="inline-flex items-center gap-1 text-ink font-semibold hover:underline">
+                  Driver Fleet <ChevronRight className="h-3.5 w-3.5" />
+                </Link>
+              </div>
+            </div>
+
+            {/* 4. AUDIT & CUSTODY */}
+            <div className="card-surface-1 space-y-4 hover:border-hairline transition">
+              <div className="flex items-center justify-between">
+                <div className="text-eyebrow font-semibold uppercase text-ink-subtle">
+                  Security & Access
+                </div>
+                <ShieldCheck className="h-4 w-4 text-amber-400" />
+              </div>
+              <h3 className="text-card-title font-bold text-ink tracking-tight">
+                Role-Based Access Control
+              </h3>
+              <p className="text-body-sm text-ink-muted leading-relaxed">
+                Enforces strict role permissions for Customers, Delivery Drivers, and Operations Admins with audit trails for status overrides.
+              </p>
+              <div className="pt-4 border-t border-hairline-soft flex items-center justify-between text-xs">
+                <span className="text-ink-subtle font-mono">Customer · Driver · Admin</span>
+                <Link href="/login" className="inline-flex items-center gap-1 text-ink font-semibold hover:underline">
+                  Security Model <ChevronRight className="h-3.5 w-3.5" />
+                </Link>
+              </div>
+            </div>
+
+            {/* 5. RESCHEDULE & FAILURE */}
+            <div className="card-surface-1 space-y-4 hover:border-hairline transition">
+              <div className="flex items-center justify-between">
+                <div className="text-eyebrow font-semibold uppercase text-ink-subtle">
+                  Exception Management
+                </div>
+                <Zap className="h-4 w-4 text-rose-400" />
+              </div>
+              <h3 className="text-card-title font-bold text-ink tracking-tight">
+                Failure & Reschedule Pipeline
+              </h3>
+              <p className="text-body-sm text-ink-muted leading-relaxed">
+                Structured failure reason reporting with self-service customer rescheduling capped at 3 attempts before manual resolution.
+              </p>
+              <div className="pt-4 border-t border-hairline-soft flex items-center justify-between text-xs">
+                <span className="text-ink-subtle font-mono">Max 3 Reschedule Attempts</span>
+                <Link href="/dashboard" className="inline-flex items-center gap-1 text-ink font-semibold hover:underline">
+                  Exception Rules <ChevronRight className="h-3.5 w-3.5" />
+                </Link>
+              </div>
+            </div>
+
+            {/* 6. EVENT MESH */}
+            <div className="card-surface-1 space-y-4 hover:border-hairline transition">
+              <div className="flex items-center justify-between">
+                <div className="text-eyebrow font-semibold uppercase text-ink-subtle">
+                  Notifications
+                </div>
+                <Clock className="h-4 w-4 text-cyan-400" />
+              </div>
+              <h3 className="text-card-title font-bold text-ink tracking-tight">
+                Event Mesh Audit Log
+              </h3>
+              <p className="text-body-sm text-ink-muted leading-relaxed">
+                Multi-channel email and SMS notification dispatcher with provider delivery logging and operations admin retry mechanics.
+              </p>
+              <div className="pt-4 border-t border-hairline-soft flex items-center justify-between text-xs">
+                <span className="text-ink-subtle font-mono">SMS / Email Retry Logs</span>
+                <Link href="/admin/notifications" className="inline-flex items-center gap-1 text-ink font-semibold hover:underline">
+                  Event Logs <ChevronRight className="h-3.5 w-3.5" />
                 </Link>
               </div>
             </div>
@@ -332,25 +327,25 @@ export default function HomePage() {
       </section>
 
       {/* 3. INTERACTIVE VOLUMETRIC SIMULATOR */}
-      <section className="py-24 border-t border-hairline-soft bg-surface-1">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-          <div className="space-y-3 text-center max-w-3xl mx-auto">
-            <div className="eyebrow-label text-product-terraform-bright">
-              Live Interactive Simulator
+      <section className="py-20 border-t border-hairline-soft bg-surface-1">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+          <div className="space-y-2 text-center max-w-3xl mx-auto">
+            <div className="eyebrow-label text-sky-400">
+              Interactive Estimator
             </div>
-            <h2 className="text-3xl sm:text-display-md font-bold text-ink tracking-tight">
-              Test Volumetric Quotation in Real Time
+            <h2 className="text-2xl sm:text-headline font-bold text-ink tracking-tight">
+              Test Volumetric Rate Calculation
             </h2>
             <p className="text-body text-ink-muted leading-relaxed">
-              Experience the deterministic chargeable weight algorithm used across all LastMileX dispatch zones.
+              Calculates chargeable weight using the standard quotient formula: <span className="font-mono text-ink">(L × B × H) / 5000</span>.
             </p>
           </div>
 
-          <div className="grid lg:grid-cols-12 gap-8 items-center bg-canvas p-6 sm:p-10 rounded-lg border border-hairline">
+          <div className="grid lg:grid-cols-12 gap-8 items-center bg-canvas p-6 sm:p-8 rounded-lg border border-hairline">
             {/* Input Parameters */}
             <div className="lg:col-span-7 space-y-6">
-              <div className="text-sm font-semibold uppercase tracking-wider text-ink-subtle border-b border-hairline-soft pb-2">
-                Package Dimension & Mass Inputs
+              <div className="text-xs font-semibold uppercase tracking-wider text-ink-muted border-b border-hairline-soft pb-2">
+                Package Dimensions & Weight
               </div>
 
               <div className="grid grid-cols-3 gap-4">
@@ -388,7 +383,7 @@ export default function HomePage() {
 
               <div className="grid grid-cols-2 gap-4 pt-2">
                 <div>
-                  <label className="block text-xs font-semibold text-ink-muted uppercase">Actual Scale Weight (kg)</label>
+                  <label className="block text-xs font-semibold text-ink-muted uppercase">Actual Weight (kg)</label>
                   <input
                     type="number"
                     step="0.1"
@@ -405,7 +400,7 @@ export default function HomePage() {
                       type="checkbox"
                       checked={isCod}
                       onChange={(e) => setIsCod(e.target.checked)}
-                      className="rounded-xs text-product-terraform focus:ring-product-terraform"
+                      className="rounded-xs text-sky-500 focus:ring-sky-500"
                     />
                     <span className="text-xs font-semibold text-ink">Cash-on-Delivery (COD)</span>
                   </label>
@@ -413,13 +408,13 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Live Calculation Output Card */}
+            {/* Live Calculation Output Panel */}
             <div className="lg:col-span-5 bg-surface-1 p-6 rounded-lg border border-hairline space-y-4">
               <div className="flex items-center justify-between border-b border-hairline-soft pb-3">
-                <span className="text-eyebrow font-semibold uppercase text-product-terraform-bright">
-                  Settlement Breakdown
+                <span className="text-eyebrow font-semibold uppercase text-ink-muted">
+                  Quote Breakdown
                 </span>
-                <span className="font-mono text-xs text-ink-muted">ZONE_LOCAL</span>
+                <span className="font-mono text-xs text-ink-subtle">INTRA_ZONE</span>
               </div>
 
               <div className="space-y-2 text-sm font-mono">
@@ -428,26 +423,26 @@ export default function HomePage() {
                   <span className="text-ink">{volumetricWeight} kg</span>
                 </div>
                 <div className="flex justify-between text-ink-muted">
-                  <span>Actual Scale Mass:</span>
+                  <span>Actual Scale Weight:</span>
                   <span className="text-ink">{calcActualWeight} kg</span>
                 </div>
-                <div className="flex justify-between text-product-waypoint font-bold pt-1 border-t border-hairline-soft">
+                <div className="flex justify-between text-sky-400 font-bold pt-1 border-t border-hairline-soft">
                   <span>Chargeable Weight:</span>
                   <span>{chargeableWeight} kg</span>
                 </div>
                 <div className="flex justify-between text-ink-muted pt-2">
-                  <span>Base Slab Charge:</span>
+                  <span>Base Rate:</span>
                   <span>₹{baseRate}.00</span>
                 </div>
                 {weightCharge > 0 && (
                   <div className="flex justify-between text-ink-muted">
-                    <span>Incremental Surcharge:</span>
+                    <span>Weight Surcharge:</span>
                     <span>₹{weightCharge}.00</span>
                   </div>
                 )}
                 {isCod && (
                   <div className="flex justify-between text-ink-muted">
-                    <span>COD Handling Escrow:</span>
+                    <span>COD Fee:</span>
                     <span>₹{codFee}.00</span>
                   </div>
                 )}
@@ -470,187 +465,31 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 4. ENTERPRISE PRICING & TIERS */}
-      <section className="py-24 border-t border-hairline-soft bg-canvas">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-          <div className="space-y-3 text-center max-w-3xl mx-auto">
-            <div className="eyebrow-label">
-              Predictable Tiering
-            </div>
-            <h2 className="text-3xl sm:text-display-md font-bold text-ink tracking-tight">
-              Transparent Infrastructure Pricing
-            </h2>
-            <p className="text-body text-ink-muted leading-relaxed">
-              No hidden fees. Pay per completed dispatch attempt with full cryptographic audit trails.
-            </p>
-          </div>
-
-          {/* 3-Up Pricing Grid */}
-          <div className="grid md:grid-cols-3 gap-6 items-stretch">
-            {/* Developer Tier */}
-            <div className="card-surface-1 flex flex-col justify-between space-y-6">
-              <div className="space-y-4">
-                <div className="text-eyebrow font-semibold uppercase text-ink-subtle">Developer</div>
-                <div className="text-3xl font-bold text-ink">Free <span className="text-xs font-normal text-ink-subtle">/ sandbox</span></div>
-                <p className="text-body-sm text-ink-muted leading-relaxed">
-                  Ideal for logistics developers building integrations and testing rate cards in sandbox mode.
-                </p>
-                <ul className="space-y-2.5 pt-4 border-t border-hairline-soft text-caption text-ink-muted">
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-product-nomad" />
-                    <span>Up to 100 mock orders / month</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-product-nomad" />
-                    <span>Full REST & Rate APIs</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-product-nomad" />
-                    <span>Deterministic FSM validation</span>
-                  </li>
-                </ul>
-              </div>
-              <Link href="/register" className="btn-secondary w-full text-center">
-                Get Started Free
-              </Link>
-            </div>
-
-            {/* Standard Fleet Tier - FEATURED (Surface-2 Lift) */}
-            <div className="card-surface-2 flex flex-col justify-between space-y-6 relative border-product-terraform">
-              <div className="absolute -top-3 right-6 bg-product-terraform text-white px-3 py-0.5 rounded-pill text-[11px] font-bold uppercase tracking-wider">
-                Most Popular
-              </div>
-              <div className="space-y-4">
-                <div className="text-eyebrow font-semibold uppercase text-product-terraform-bright">Professional Fleet</div>
-                <div className="text-3xl font-bold text-ink">₹2,499 <span className="text-xs font-normal text-ink-subtle">/ mo base</span></div>
-                <p className="text-body-sm text-ink-muted leading-relaxed">
-                  Designed for active delivery operations, regional couriers, and high-frequency dispatchers.
-                </p>
-                <ul className="space-y-2.5 pt-4 border-t border-hairline-soft text-caption text-ink-muted">
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-product-nomad" />
-                    <span>Unlimited order volume</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-product-nomad" />
-                    <span>Autonomous Driver Auto-Assignment</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-product-nomad" />
-                    <span>Cash-on-Delivery Escrow Tracking</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-product-nomad" />
-                    <span>SMS / Email Retry Mesh</span>
-                  </li>
-                </ul>
-              </div>
-              <Link href="/register" className="btn-primary w-full text-center">
-                Start 14-Day Trial
-              </Link>
-            </div>
-
-            {/* Enterprise Tier */}
-            <div className="card-surface-1 flex flex-col justify-between space-y-6">
-              <div className="space-y-4">
-                <div className="text-eyebrow font-semibold uppercase text-ink-subtle">Enterprise Multi-Region</div>
-                <div className="text-3xl font-bold text-ink">Custom <span className="text-xs font-normal text-ink-subtle">/ SLA</span></div>
-                <p className="text-body-sm text-ink-muted leading-relaxed">
-                  Dedicated clusters, isolated database instances, custom slab matrices, and 99.99% dispatch uptime SLAs.
-                </p>
-                <ul className="space-y-2.5 pt-4 border-t border-hairline-soft text-caption text-ink-muted">
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-product-nomad" />
-                    <span>Dedicated Cluster Isolation</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-product-nomad" />
-                    <span>Custom Rate Cards & Surcharges</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-product-nomad" />
-                    <span>24/7 Dedicated Engineering Support</span>
-                  </li>
-                </ul>
-              </div>
-              <Link href="/login" className="btn-secondary w-full text-center">
-                Contact Enterprise Sales
-              </Link>
-            </div>
-          </div>
-
-          {/* Comparison Table */}
-          <div className="pt-8 space-y-4">
-            <div className="text-eyebrow font-semibold uppercase tracking-eyebrow text-ink">
-              Feature Comparison Matrix
-            </div>
-            <div className="overflow-x-auto rounded-lg border border-hairline bg-surface-1">
-              <table className="min-w-full text-left text-sm">
-                <thead className="border-b border-hairline bg-surface-2 text-caption font-semibold uppercase text-ink-muted">
-                  <tr>
-                    <th className="py-3.5 px-6">Capability</th>
-                    <th className="py-3.5 px-6">Developer</th>
-                    <th className="py-3.5 px-6">Professional Fleet</th>
-                    <th className="py-3.5 px-6">Enterprise</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-hairline-soft font-mono text-caption">
-                  <tr className="bg-canvas/40">
-                    <td className="py-3 px-6 text-ink font-sans font-medium">Volumetric Surcharging</td>
-                    <td className="py-3 px-6 text-ink-muted">Standard 5000</td>
-                    <td className="py-3 px-6 text-product-nomad">Custom Divisors</td>
-                    <td className="py-3 px-6 text-product-nomad">Zone-Specific Matrix</td>
-                  </tr>
-                  <tr className="bg-canvas/40">
-                    <td className="py-3 px-6 text-ink font-sans font-medium">Auto-Assignment Algorithm</td>
-                    <td className="py-3 px-6 text-ink-subtle">Manual Only</td>
-                    <td className="py-3 px-6 text-product-nomad">Multi-Factor Scoring</td>
-                    <td className="py-3 px-6 text-product-nomad">Custom Weight Modifiers</td>
-                  </tr>
-                  <tr className="bg-canvas/40">
-                    <td className="py-3 px-6 text-ink font-sans font-medium">Cryptographic Audit Trails</td>
-                    <td className="py-3 px-6 text-ink-muted">7 Days</td>
-                    <td className="py-3 px-6 text-ink-muted">90 Days</td>
-                    <td className="py-3 px-6 text-product-nomad">Indefinite Cold Storage</td>
-                  </tr>
-                  <tr className="bg-canvas/40">
-                    <td className="py-3 px-6 text-ink font-sans font-medium">State Machine Invariants</td>
-                    <td className="py-3 px-6 text-product-nomad">Enforced</td>
-                    <td className="py-3 px-6 text-product-nomad">Enforced</td>
-                    <td className="py-3 px-6 text-product-nomad">Enforced + Formal Model</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 5. CTA BANNER */}
-      <section className="py-24 border-t border-hairline-soft bg-canvas">
+      {/* 4. CTA BANNER */}
+      <section className="py-20 border-t border-hairline-soft bg-canvas">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="rounded-xxl bg-surface-1 border border-hairline p-8 sm:p-12 md:p-16 text-center space-y-6">
-            <div className="eyebrow-label text-product-waypoint">
-              Ready to Upgrade Your Dispatch Stack?
+          <div className="rounded-lg bg-surface-1 border border-hairline p-8 sm:p-12 text-center space-y-5">
+            <div className="eyebrow-label text-sky-400">
+              Ready to Dispatch?
             </div>
-            <h2 className="text-3xl sm:text-headline md:text-display-md font-bold text-ink max-w-3xl mx-auto tracking-tight">
-              Start Dispatching with Mathematical Precision Today.
+            <h2 className="text-2xl sm:text-headline font-bold text-ink max-w-2xl mx-auto tracking-tight">
+              Start Managing Last-Mile Deliveries
             </h2>
-            <p className="text-body-lg text-ink-muted max-w-2xl mx-auto leading-relaxed">
-              Join leading logistics networks running on LastMileX. Book your first shipment or explore the admin console in seconds.
+            <p className="text-body text-ink-muted max-w-xl mx-auto leading-relaxed">
+              Access customer, driver, or admin consoles directly. Calculate rates or create shipments with instant quote snapshots.
             </p>
-            <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
+            <div className="flex flex-wrap items-center justify-center gap-3 pt-3">
               <Link
                 href="/register"
-                className="btn-primary text-sm px-6 py-3"
+                className="btn-primary"
               >
-                Create Free Account
+                Create Account
               </Link>
               <Link
                 href="/orders/new"
-                className="btn-secondary text-sm px-6 py-3"
+                className="btn-secondary"
               >
-                Launch Rate Calculator
+                Book Shipment
               </Link>
             </div>
           </div>

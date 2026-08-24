@@ -110,7 +110,7 @@ export default function AdminEditAgentPage({ params }: { params: Promise<{ id: s
       )}
 
       {success && (
-        <div role="status" className="flex items-center gap-2.5 rounded-md border border-product-nomad/30 bg-product-nomad/10 p-4 text-sm text-product-nomad">
+        <div role="status" className="flex items-center gap-2.5 rounded-md border border-emerald-500/20 bg-emerald-500/10 p-4 text-sm text-emerald-400">
           <CheckCircle2 className="h-5 w-5 shrink-0" aria-hidden="true" />
           <span>Agent profile updated successfully.</span>
         </div>
@@ -193,7 +193,7 @@ export default function AdminEditAgentPage({ params }: { params: Promise<{ id: s
             type="submit"
             disabled={saving}
             aria-busy={saving}
-            className="btn-product-terraform !px-5 !py-2 text-xs"
+            className="btn-primary !px-5 !py-2 text-xs"
           >
             {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" aria-hidden="true" /> : <CheckCircle2 className="h-4 w-4 mr-2" aria-hidden="true" />}
             {saving ? "Saving Changes..." : "Save Profile"}

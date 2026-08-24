@@ -18,7 +18,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark bg-canvas text-ink">
-      <body className="antialiased min-h-screen bg-canvas text-ink flex flex-col font-sans selection:bg-product-terraform selection:text-white">
+      <body className="antialiased min-h-screen bg-canvas text-ink flex flex-col font-sans selection:bg-sky-500 selection:text-white">
         <AuthProvider>
           <NavProvider>
             <Navbar />

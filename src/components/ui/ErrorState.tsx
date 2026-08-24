@@ -41,16 +41,16 @@ export function ErrorState({
     <div
       role="alert"
       aria-live="assertive"
-      className={`rounded-lg border border-product-consul/40 bg-surface-1 p-5 text-ink space-y-3 ${className}`}
+      className={`rounded-lg border border-rose-500/30 bg-surface-1 p-5 text-ink space-y-3 ${className}`}
     >
       <div className="flex items-start gap-3">
-        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-product-consul/20 text-product-consul shrink-0 border border-product-consul/30">
+        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-rose-500/10 text-rose-400 shrink-0 border border-rose-500/20">
           <AlertCircle className="h-4 w-4" aria-hidden="true" />
         </div>
         <div className="flex-1 space-y-1">
           <h4 className="text-sm font-semibold text-ink">{title}</h4>
           <p className="text-xs text-ink-muted leading-relaxed">{message}</p>
-          {help && <p className="text-[11px] text-product-vault/90 font-mono mt-1">{help}</p>}
+          {help && <p className="text-[11px] text-amber-400 font-mono mt-1">{help}</p>}
         </div>
       </div>
 

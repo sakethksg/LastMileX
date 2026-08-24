@@ -63,34 +63,34 @@ export default function AgentOrdersPage() {
                 <OrderStatusBadge status={order.status} />
               </div>
 
-              <div className="space-y-2 text-xs text-ink-muted">
-                <div className="flex items-start gap-2">
-                  <MapPin className="h-4 w-4 text-product-waypoint shrink-0 mt-0.5" aria-hidden="true" />
-                  <div>
-                    <span className="text-ink-subtle uppercase tracking-wider text-[10px]">Pickup: </span>
-                    <span className="text-ink">{order.pickupAddress}</span> (PIN: {order.pickupPinCode})
+                <div className="text-xs text-ink-muted space-y-1.5 pt-1">
+                  <div className="flex items-start gap-2">
+                    <MapPin className="h-4 w-4 text-sky-400 shrink-0 mt-0.5" aria-hidden="true" />
+                    <div>
+                      <span className="text-ink-subtle font-mono uppercase text-[10px] block">Pickup</span>
+                      <span className="text-ink truncate block">{order.pickupAddress}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <MapPin className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" aria-hidden="true" />
+                    <div>
+                      <span className="text-ink-subtle font-mono uppercase text-[10px] block">Drop</span>
+                      <span className="text-ink truncate block">{order.dropAddress}</span>
+                    </div>
                   </div>
                 </div>
-                <div className="flex items-start gap-2">
-                  <MapPin className="h-4 w-4 text-product-nomad shrink-0 mt-0.5" aria-hidden="true" />
-                  <div>
-                    <span className="text-ink-subtle uppercase tracking-wider text-[10px]">Drop: </span>
-                    <span className="text-ink">{order.dropAddress}</span> (PIN: {order.dropPinCode})
-                  </div>
-                </div>
-              </div>
 
-              <div className="pt-2 border-t border-hairline-soft flex items-center justify-between">
-                <span className="text-xs font-mono text-ink-subtle">
-                  Payment: <span className="text-ink font-semibold">{order.paymentType}</span>
-                </span>
-                <Link
-                  href={`/agent/orders/${order.id}`}
-                  className="btn-product-vault !px-3 !py-1 text-xs"
-                >
-                  Execute Delivery <ArrowRight className="h-3.5 w-3.5 ml-1.5" aria-hidden="true" />
-                </Link>
-              </div>
+                <div className="pt-2 flex items-center justify-between border-t border-hairline-soft">
+                  <div className="text-xs text-ink-subtle font-mono">
+                    Payment: <span className="text-ink font-semibold">{order.paymentType}</span>
+                  </div>
+                  <Link
+                    href={`/agent/orders/${order.id}`}
+                    className="btn-primary !px-3 !py-1 text-xs"
+                  >
+                    Execute Actions <ArrowRight className="h-3 w-3 ml-1" aria-hidden="true" />
+                  </Link>
+                </div>
             </div>
           ))}
         </div>

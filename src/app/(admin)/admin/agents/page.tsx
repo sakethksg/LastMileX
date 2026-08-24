@@ -121,7 +121,7 @@ export default function AdminAgentsPage() {
                     <td className="py-3.5 px-4">
                       <AgentAvailabilityBadge availability={availability} />
                     </td>
-                    <td className="py-3.5 px-4 text-xs font-mono font-bold text-product-nomad">
+                    <td className="py-3.5 px-4 text-xs font-mono font-bold text-emerald-400">
                       {profile?.activeDeliveryCount || 0} / {profile?.maxConcurrentOrders || 0} active
                     </td>
                     <td className="py-3.5 px-4 text-xs text-ink-muted font-mono">

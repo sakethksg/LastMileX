@@ -79,34 +79,34 @@ export default function CustomerDashboardPage() {
       <section aria-label="Order summary metrics" className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
         <div className="card-surface-1 p-5">
           <div className="flex items-center gap-2 text-eyebrow font-semibold uppercase tracking-eyebrow text-ink-subtle">
-            <Package className="h-3.5 w-3.5 text-product-waypoint" aria-hidden="true" />
+            <Package className="h-3.5 w-3.5 text-sky-400" aria-hidden="true" />
             Total Orders
           </div>
           <div className="mt-2 text-2xl font-bold text-ink">{overview.totalOrders}</div>
         </div>
 
         <div className="card-surface-1 p-5">
-          <div className="flex items-center gap-2 text-eyebrow font-semibold uppercase tracking-eyebrow text-product-vault">
-            <Truck className="h-3.5 w-3.5 text-product-vault" aria-hidden="true" />
+          <div className="flex items-center gap-2 text-eyebrow font-semibold uppercase tracking-eyebrow text-amber-400">
+            <Truck className="h-3.5 w-3.5 text-amber-400" aria-hidden="true" />
             Active
           </div>
-          <div className="mt-2 text-2xl font-bold text-product-vault">{overview.activeOrders}</div>
+          <div className="mt-2 text-2xl font-bold text-amber-400">{overview.activeOrders}</div>
         </div>
 
         <div className="card-surface-1 p-5">
-          <div className="flex items-center gap-2 text-eyebrow font-semibold uppercase tracking-eyebrow text-product-nomad">
-            <CheckCircle2 className="h-3.5 w-3.5 text-product-nomad" aria-hidden="true" />
+          <div className="flex items-center gap-2 text-eyebrow font-semibold uppercase tracking-eyebrow text-emerald-400">
+            <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" aria-hidden="true" />
             Delivered
           </div>
-          <div className="mt-2 text-2xl font-bold text-product-nomad">{overview.deliveredOrders}</div>
+          <div className="mt-2 text-2xl font-bold text-emerald-400">{overview.deliveredOrders}</div>
         </div>
 
         <div className="card-surface-1 p-5">
-          <div className="flex items-center gap-2 text-eyebrow font-semibold uppercase tracking-eyebrow text-product-consul">
-            <AlertTriangle className="h-3.5 w-3.5 text-product-consul" aria-hidden="true" />
+          <div className="flex items-center gap-2 text-eyebrow font-semibold uppercase tracking-eyebrow text-rose-400">
+            <AlertTriangle className="h-3.5 w-3.5 text-rose-400" aria-hidden="true" />
             Failed / Retry
           </div>
-          <div className="mt-2 text-2xl font-bold text-product-consul">{overview.failedOrders}</div>
+          <div className="mt-2 text-2xl font-bold text-rose-400">{overview.failedOrders}</div>
         </div>
 
         <div className="card-surface-1 p-5">
@@ -120,13 +120,13 @@ export default function CustomerDashboardPage() {
 
       {/* Active Deliveries Banner */}
       {activeDeliveries.length > 0 && (
-        <section aria-label="Active shipments" className="rounded-lg border border-product-waypoint/30 bg-surface-1 p-5 sm:p-6 space-y-4">
+        <section aria-label="Active shipments" className="rounded-lg border border-hairline bg-surface-1 p-5 sm:p-6 space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-base sm:text-lg font-bold text-ink flex items-center gap-2">
-              <Truck className="h-5 w-5 text-product-waypoint" aria-hidden="true" />
+              <Truck className="h-5 w-5 text-sky-400" aria-hidden="true" />
               Active Shipments in Transit ({activeDeliveries.length})
             </h2>
-            <span className="font-mono text-xs text-product-waypoint">LIVE DISPATCH</span>
+            <span className="font-mono text-xs text-sky-400">LIVE DISPATCH</span>
           </div>
 
           <div className="grid sm:grid-cols-2 gap-4">
@@ -152,7 +152,7 @@ export default function CustomerDashboardPage() {
 
                 <Link
                   href={`/orders/${delivery.id}`}
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-product-waypoint hover:underline focus-visible:outline-2 focus-visible:outline-accent-blue rounded-xs"
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-sky-400 hover:underline focus-visible:outline-2 focus-visible:outline-accent-blue rounded-xs"
                 >
                   View live progress <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
                 </Link>
@@ -166,7 +166,7 @@ export default function CustomerDashboardPage() {
       <section aria-label="Recent orders" className="card-surface-1 space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-base sm:text-lg font-bold text-ink">Recent Orders</h2>
-          <Link href="/orders" className="text-xs font-semibold text-product-waypoint hover:underline focus-visible:outline-2 focus-visible:outline-accent-blue rounded-xs">
+          <Link href="/orders" className="text-xs font-semibold text-sky-400 hover:underline focus-visible:outline-2 focus-visible:outline-accent-blue rounded-xs">
             View all orders
           </Link>
         </div>

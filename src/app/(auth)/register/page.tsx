@@ -55,7 +55,7 @@ export default function RegisterPage() {
           <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-md bg-surface-2 border border-hairline text-ink">
             <span className="font-mono font-bold text-sm">LX</span>
           </div>
-          <div className="text-eyebrow font-semibold uppercase tracking-eyebrow text-product-waypoint">
+          <div className="text-eyebrow font-semibold uppercase tracking-eyebrow text-ink-subtle">
             Account Registration
           </div>
           <h1 className="text-2xl font-bold text-ink tracking-tight font-sans">
@@ -147,7 +147,7 @@ export default function RegisterPage() {
 
         <div className="text-center text-xs text-ink-subtle border-t border-hairline-soft pt-4">
           Already have an account?{" "}
-          <Link href="/login" className="font-semibold text-product-waypoint hover:underline focus-visible:outline-2 focus-visible:outline-accent-blue rounded-xs">
+          <Link href="/login" className="font-semibold text-sky-400 hover:underline focus-visible:outline-2 focus-visible:outline-accent-blue rounded-xs">
             Sign in
           </Link>
         </div>
