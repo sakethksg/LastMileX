@@ -127,33 +127,34 @@ export interface AgentDashboardData {
 }
 
 export interface AdminDashboardData {
-  orders: {
-    total: number;
-    active: number;
-    delivered: number;
-    failed: number;
-    cancelled: number;
-    statusBreakdown: Record<string, number>;
+  overview: {
+    totalOrders: number;
+    activeOrders: number;
+    deliveredOrders: number;
+    failedOrders: number;
+    cancelledOrders: number;
   };
-  deliveryPerformance: {
-    todayCompleted: number;
-    todayFailed: number;
-    totalDelivered: number;
-    totalFailed: number;
+  deliveryMetrics: {
+    completedToday: number;
+    failedToday: number;
     successRate: number;
   };
-  agentFleet: {
-    totalAgents: number;
+  agents: {
+    total: number;
     available: number;
     busy: number;
     offline: number;
     atCapacity: number;
   };
-  financialMetrics: {
+  financials: {
     totalOrderValue: number;
     deliveredOrderValue: number;
     codExpectedValue: number;
   };
+  ordersByStatus: Array<{
+    status: string;
+    count: number;
+  }>;
   recentOrders: any[];
   recentFailures: any[];
 }

@@ -108,23 +108,27 @@ export default function AdminAgentsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-hairline-soft">
-                {agents.map((agent) => (
+                {agents.map((agent) => {
+                  const profile = agent.deliveryAgentProfile;
+                  const availability = profile?.availability || "OFFLINE";
+
+                  return (
                   <tr key={agent.id} className="hover:bg-surface-2/50 transition">
                     <td className="py-3.5 px-4 font-semibold text-ink">
                       <div>{agent.user?.name || "Agent"}</div>
                       <div className="text-xs text-ink-subtle font-mono font-normal">{agent.user?.email}</div>
                     </td>
                     <td className="py-3.5 px-4">
-                      <AgentAvailabilityBadge availability={agent.availability} />
+                      <AgentAvailabilityBadge availability={availability} />
                     </td>
                     <td className="py-3.5 px-4 text-xs font-mono font-bold text-product-nomad">
-                      {agent.activeDeliveryCount || 0} / {agent.maxConcurrentOrders} active
+                      {profile?.activeDeliveryCount || 0} / {profile?.maxConcurrentOrders || 0} active
                     </td>
                     <td className="py-3.5 px-4 text-xs text-ink-muted font-mono">
-                      {agent.vehicleType || "BIKE"} ({agent.vehicleNumber || "KA-01"})
+                      {profile?.vehicleType || "BIKE"} ({profile?.vehicleNumber || "KA-01"})
                     </td>
                     <td className="py-3.5 px-4 text-xs text-ink-muted">
-                      {agent.currentZone?.name || "All Zones"}
+                      {profile?.currentZone?.name || "All Zones"}
                     </td>
                     <td className="py-3.5 px-4 text-right">
                       <Link
@@ -135,7 +139,8 @@ export default function AdminAgentsPage() {
                       </Link>
                     </td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           </div>

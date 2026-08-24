@@ -53,7 +53,7 @@ export default function AdminDashboardPage() {
     );
   }
 
-  const { orders, deliveryPerformance, agentFleet, financialMetrics, recentOrders, recentFailures } = data;
+  const { overview, deliveryMetrics, agents, financials, ordersByStatus, recentOrders, recentFailures } = data;
 
   return (
     <div className="space-y-8">
@@ -70,9 +70,9 @@ export default function AdminDashboardPage() {
             <Package className="h-3.5 w-3.5 text-product-waypoint" aria-hidden="true" />
             Total Orders
           </div>
-          <div className="mt-2 text-2xl font-bold text-ink">{orders.total}</div>
+          <div className="mt-2 text-2xl font-bold text-ink">{overview.totalOrders}</div>
           <div className="mt-1 text-[11px] text-ink-muted font-mono">
-            {orders.active} active ({orders.statusBreakdown.ASSIGNED || 0} assigned, {orders.statusBreakdown.OUT_FOR_DELIVERY || 0} out)
+            {overview.activeOrders} active ({ordersByStatus.find((item) => item.status === "ASSIGNED")?.count || 0} assigned, {ordersByStatus.find((item) => item.status === "OUT_FOR_DELIVERY")?.count || 0} out)
           </div>
         </div>
 
@@ -81,9 +81,9 @@ export default function AdminDashboardPage() {
             <TrendingUp className="h-3.5 w-3.5 text-product-nomad" aria-hidden="true" />
             Success Rate
           </div>
-          <div className="mt-2 text-2xl font-bold text-product-nomad">{deliveryPerformance.successRate}%</div>
+          <div className="mt-2 text-2xl font-bold text-product-nomad">{deliveryMetrics.successRate}%</div>
           <div className="mt-1 text-[11px] text-ink-muted font-mono">
-            {deliveryPerformance.totalDelivered} delivered / {deliveryPerformance.totalFailed} failed
+            {deliveryMetrics.completedToday} completed today / {deliveryMetrics.failedToday} failed today
           </div>
         </div>
 
@@ -92,9 +92,9 @@ export default function AdminDashboardPage() {
             <Users className="h-3.5 w-3.5 text-product-terraform-bright" aria-hidden="true" />
             Agent Fleet
           </div>
-          <div className="mt-2 text-2xl font-bold text-ink">{agentFleet.totalAgents} Agents</div>
+          <div className="mt-2 text-2xl font-bold text-ink">{agents.total} Agents</div>
           <div className="mt-1 text-[11px] text-ink-muted font-mono">
-            {agentFleet.available} available, {agentFleet.atCapacity} at capacity
+            {agents.available} available, {agents.atCapacity} at capacity
           </div>
         </div>
 
@@ -104,10 +104,10 @@ export default function AdminDashboardPage() {
             Revenue Snapshot
           </div>
           <div className="mt-2 text-2xl font-bold text-ink">
-            ₹{financialMetrics.totalOrderValue.toFixed(2)}
+            ₹{financials.totalOrderValue.toFixed(2)}
           </div>
           <div className="mt-1 text-[11px] text-ink-muted font-mono">
-            ₹{financialMetrics.deliveredOrderValue.toFixed(2)} fulfilled
+            ₹{financials.deliveredOrderValue.toFixed(2)} fulfilled
           </div>
         </div>
       </section>
@@ -123,19 +123,19 @@ export default function AdminDashboardPage() {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
             <div className="bg-product-nomad/10 border border-product-nomad/30 rounded-md p-3 text-center">
               <div className="text-eyebrow font-bold text-product-nomad">AVAILABLE</div>
-              <div className="text-xl font-bold text-ink mt-1 font-mono">{agentFleet.available}</div>
+              <div className="text-xl font-bold text-ink mt-1 font-mono">{agents.available}</div>
             </div>
             <div className="bg-product-vault/10 border border-product-vault/30 rounded-md p-3 text-center">
               <div className="text-eyebrow font-bold text-product-vault">BUSY</div>
-              <div className="text-xl font-bold text-ink mt-1 font-mono">{agentFleet.busy}</div>
+              <div className="text-xl font-bold text-ink mt-1 font-mono">{agents.busy}</div>
             </div>
             <div className="bg-surface-2 border border-hairline rounded-md p-3 text-center">
               <div className="text-eyebrow font-bold text-ink-muted">OFFLINE</div>
-              <div className="text-xl font-bold text-ink mt-1 font-mono">{agentFleet.offline}</div>
+              <div className="text-xl font-bold text-ink mt-1 font-mono">{agents.offline}</div>
             </div>
             <div className="bg-product-consul/10 border border-product-consul/30 rounded-md p-3 text-center">
               <div className="text-eyebrow font-bold text-product-consul">AT CAPACITY</div>
-              <div className="text-xl font-bold text-ink mt-1 font-mono">{agentFleet.atCapacity}</div>
+              <div className="text-xl font-bold text-ink mt-1 font-mono">{agents.atCapacity}</div>
             </div>
           </div>
         </section>
@@ -147,7 +147,7 @@ export default function AdminDashboardPage() {
           </h2>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 pt-1 text-xs">
-            {Object.entries(orders.statusBreakdown).map(([status, count]) => (
+            {ordersByStatus.map(({ status, count }) => (
               <div key={status} className="flex justify-between items-center p-2.5 rounded-md bg-surface-2 border border-hairline font-mono">
                 <span className="font-semibold text-ink-muted text-[11px]">{status}</span>
                 <span className="font-bold text-ink">{count}</span>
@@ -223,7 +223,7 @@ export default function AdminDashboardPage() {
                   <div className="flex items-center gap-2 shrink-0">
                     <span className="text-[11px] font-mono text-ink-subtle">Attempt #{failure.attemptNumber}</span>
                     <Link
-                      href={`/admin/orders/${failure.orderId}`}
+                      href={`/admin/orders/${failure.order?.id}`}
                       className="btn-secondary !px-2.5 !py-1 text-[11px]"
                     >
                       Reschedule

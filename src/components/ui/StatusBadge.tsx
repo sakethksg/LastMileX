@@ -43,12 +43,13 @@ export function AgentAvailabilityBadge({ availability }: { availability: AgentAv
     },
   };
 
-  const current = styles[availability] || styles[AgentAvailability.OFFLINE];
+  const normalizedAvailability = availability || AgentAvailability.OFFLINE;
+  const current = styles[normalizedAvailability] || styles[AgentAvailability.OFFLINE];
 
   return (
     <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-pill text-[11px] font-medium border ${current.bg} ${current.text}`}>
       <span className={`h-1.5 w-1.5 rounded-full ${current.dot}`} />
-      {availability.replace(/_/g, " ")}
+      {normalizedAvailability.replace(/_/g, " ")}
     </span>
   );
 }
