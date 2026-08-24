@@ -57,7 +57,19 @@ async function createSupabaseAuthUsers() {
 
   async function findOrCreateUser(email: string, password: string | undefined, name: string) {
     const existingUser = userList.users.find((user) => user.email === email);
-    if (existingUser) return existingUser;
+    if (existingUser) {
+      if (password) {
+        const { data, error } = await adminClient.auth.admin.updateUserById(existingUser.id, {
+          password,
+          email_confirm: true,
+        });
+        if (error || !data.user) {
+          throw new Error(`Failed to update ${email}: ${error?.message || "unknown error"}`);
+        }
+        return data.user;
+      }
+      return existingUser;
+    }
     if (!password) throw new Error(`Missing seed password for new Auth user ${email}`);
     const { data, error } = await adminClient.auth.admin.createUser({
       email,
