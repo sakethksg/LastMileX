@@ -82,18 +82,27 @@ export default function HomePage() {
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex justify-center">
           {/* Centered Hero Copy */}
           <div className="max-w-3xl flex flex-col items-center text-center space-y-6">
-            <h1 className="max-w-4xl text-4xl sm:text-5xl lg:text-display-lg font-bold text-ink tracking-tight leading-[1.1]">
-              Every shipment.   Accounted for.
-            </h1>
+            {/* New Announcement Pill */}
+            {/* <div className="inline-flex items-center gap-2.5 rounded-full border border-white/10 bg-white/[0.06] px-3.5 py-1 text-xs text-zinc-300 backdrop-blur-md shadow-inner">
+              <span className="rounded-full bg-white px-2 py-0.5 text-[10px] font-bold text-black uppercase tracking-wider">
+                NEW
+              </span>
+              <span>Next-Gen Dispatch Engine</span>
+            </div> */}
 
-            <p className="text-body-lg text-ink-muted leading-relaxed max-w-xl">
+            <h1 className="max-w-4xl text-4xl sm:text-5xl lg:text-display-lg font-bold text-white tracking-tight leading-[1.1]">
+              Every shipment. Accounted for.
+            </h1>
+            
+
+            <p className="text-body-lg text-zinc-400 leading-relaxed max-w-xl">
               Quote accurately, assign drivers automatically, and maintain an immutable record of every delivery from pickup to proof of delivery.
             </p>
 
             <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
               <Link
                 href={getDashboardHref()}
-                className="btn-primary"
+                className="inline-flex items-center justify-center font-medium text-white bg-white/10 hover:bg-white/15 border border-white/10 rounded-xl px-6 py-2.5 text-sm transition active:scale-[0.98] backdrop-blur-md"
               >
                 <span>{user ? "Open Console" : "Start Dispatching"}</span>
                 <ArrowRight className="ml-2 h-4 w-4" />
@@ -101,9 +110,9 @@ export default function HomePage() {
 
               <Link
                 href="/orders/new"
-                className="btn-secondary"
+                className="inline-flex items-center justify-center font-medium text-white bg-white/10 hover:bg-white/15 border border-white/10 rounded-xl px-6 py-2.5 text-sm transition active:scale-[0.98] backdrop-blur-md"
               >
-                <Calculator className="mr-2 h-4 w-4 text-ink-muted" />
+                <Calculator className="mr-2 h-4 w-4 text-zinc-400" />
                 <span>Calculate Quote</span>
               </Link>
             </div>
